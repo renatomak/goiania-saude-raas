@@ -1,30 +1,16 @@
 package br.gov.goiania.saude.raas.fixtures;
 
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasRequest;
-import br.com.six2six.fixturefactory.Rule;
-import br.com.six2six.fixturefactory.loader.TemplateLoader;
-import br.com.six2six.fixturefactory.Fixture;
 
-import static br.gov.goiania.saude.raas.testutils.TestConstants.FIXTURE_LABEL_NOT_FOUND;
-import static br.gov.goiania.saude.raas.testutils.TestConstants.FIXTURE_LABEL_VALID;
+public final class ListarArquivosRaasRequestFixture {
 
-public class ListarArquivosRaasRequestFixture implements TemplateLoader {
+    private ListarArquivosRaasRequestFixture() { }
 
-    @Override
-    public void load() {
-        Fixture.of(ListarArquivosRaasRequest.class).addTemplate(FIXTURE_LABEL_VALID, new Rule() {{
-            add("mes", 5);
-            add("ano", 2026);
-            add("codigoEmpresa", "123");
-            add("situacao", 3);
-        }});
+    public static ListarArquivosRaasRequest valido() {
+        return new ListarArquivosRaasRequest(5, 2026, "123", 3);
+    }
 
-        Fixture.of(ListarArquivosRaasRequest.class).addTemplate(FIXTURE_LABEL_NOT_FOUND, new Rule() {{
-            add("mes", 5);
-            add("ano", 2026);
-            add("codigoEmpresa", "999");
-            add("situacao", 3);
-        }});
+    public static ListarArquivosRaasRequest notFound() {
+        return new ListarArquivosRaasRequest(5, 2026, "999", 3);
     }
 }
-
