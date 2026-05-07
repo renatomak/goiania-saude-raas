@@ -27,7 +27,7 @@
         </module>
 
         <module name="RegexpSinglelineJava">
-            <property name="format" value="/\*\*"/>
+            <property name="format" value="^\s*/\*\*"/>
             <property name="message" value="Comentarios JavaDoc nao sao permitidos. O codigo deve ser autodocumentado."/>
         </module>
 

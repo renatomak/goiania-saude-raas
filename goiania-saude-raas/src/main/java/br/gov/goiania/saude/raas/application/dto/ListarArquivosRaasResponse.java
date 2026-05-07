@@ -9,7 +9,6 @@ public record ListarArquivosRaasResponse(
         LocalDate dataGeracao,
         String codigoEmpresa,
         String nomeEmpresa,
-        String descricaoProcesso,
         String path,
         String status,
         BigDecimal totalFolha

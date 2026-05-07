@@ -12,12 +12,12 @@ spring:
       connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT_MS:30000}
   jpa:
     hibernate:
-      ddl-auto: none # ou 'validate' se quiser apenas validar a existência das tabelas
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+        format_sql: false
         default_schema: goiania_saude
 
 server:
@@ -26,7 +26,10 @@ server:
     context-path: /api
 
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{correlationId}] %-5level %logger{36} - %msg%n"
   level:
     br.gov.goiania.saude.raas: INFO
     org.springframework.web: WARN
-    org.hibernate.SQL: WARN
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

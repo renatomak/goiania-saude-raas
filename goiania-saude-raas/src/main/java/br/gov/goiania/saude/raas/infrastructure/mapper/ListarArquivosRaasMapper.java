@@ -11,13 +11,11 @@ public interface ListarArquivosRaasMapper {
 
     @Mapping(target = "codigoEmpresa", source = "codigoEmpresa")
     @Mapping(target = "nomeEmpresa", source = "nomeEmpresa")
-    @Mapping(target = "descricaoProcesso", source = "descricaoProcesso")
     @Mapping(target = "dataGeracao", source = "dataGeracao")
     ListarArquivosRaas toDomain(ListarArquivosRaasEntity entity);
 
     @Mapping(target = "codigoEmpresa", source = "codigoEmpresa")
     @Mapping(target = "nomeEmpresa", source = "nomeEmpresa")
-    @Mapping(target = "descricaoProcesso", source = "descricaoProcesso")
     @Mapping(target = "dataGeracao", source = "dataGeracao")
     ListarArquivosRaasResponse toResponse(ListarArquivosRaas domain);
 }

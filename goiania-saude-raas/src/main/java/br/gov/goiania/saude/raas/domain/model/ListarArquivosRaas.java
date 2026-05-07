@@ -17,7 +17,6 @@ public class ListarArquivosRaas {
     private final LocalDate dataGeracao;
     private final String codigoEmpresa;
     private final String nomeEmpresa;
-    private final String descricaoProcesso;
     private final String path;
     private final String status;
     private final BigDecimal totalFolha;

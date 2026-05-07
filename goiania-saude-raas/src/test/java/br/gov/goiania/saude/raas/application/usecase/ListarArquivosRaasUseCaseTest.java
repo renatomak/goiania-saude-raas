@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,7 +39,7 @@ class ListarArquivosRaasUseCaseTest {
     @Test
     void deveLancarExcecaoQuandoNenhumRaasEncontrado() {
         final ListarArquivosRaasRequest request = new ListarArquivosRaasRequest(
-                5, 2024, "999", List.of("PROCESSADO"));
+                5, 2024, "999", 3);
 
         when(repositoryPort.execute(any(ListarArquivosRaasFiltro.class)))
                 .thenReturn(Collections.emptyList());

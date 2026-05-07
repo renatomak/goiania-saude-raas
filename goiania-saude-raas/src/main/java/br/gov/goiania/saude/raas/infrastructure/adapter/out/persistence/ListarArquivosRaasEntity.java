@@ -41,8 +41,6 @@ public class ListarArquivosRaasEntity {
     @Column(name = "nome_empresa")
     private String nomeEmpresa;
 
-    @Column(name = "descricao")
-    private String descricaoProcesso;
 
     @Column(name = "path")
     private String path;

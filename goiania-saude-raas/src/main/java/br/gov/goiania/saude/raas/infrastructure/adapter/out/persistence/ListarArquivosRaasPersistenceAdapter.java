@@ -23,7 +23,7 @@ public class ListarArquivosRaasPersistenceAdapter implements ListarArquivosRaasP
                         filtro.mes(),
                         filtro.ano(),
                         filtro.codigoEmpresa(),
-                        filtro.statusPermitidos()
+                        filtro.status()
                 )
                 .stream()
                 .map(mapper::toDomain)

@@ -10,22 +10,22 @@ public interface ListarArquivosRaasRepository extends JpaRepository<ListarArquiv
 
     @Query(value = """
             SELECT
+                r.cd_raas_processo AS id,
                 r.mes,
                 r.ano,
                 r.dt_geracao,
-                r.empresa AS codigo_empresa,
+                r.empresa AS empresa,
                 e.descricao AS nome_empresa,
-                r.descricao AS descricao_processo,
                 r.path,
                 r.status,
                 r.total_folha
             FROM raas_processo r
             LEFT JOIN empresa e ON e.empresa = r.empresa
             WHERE r.total_folha > 0
-              AND r.mes = :mes
-              AND r.ano = :ano
-              AND r.empresa = :empresa
-              AND r.status IN (:statusList)
+              AND (:mes IS NULL OR r.mes = :mes)
+              AND (:ano IS NULL OR r.ano = :ano)
+              AND (:empresa IS NULL OR r.empresa = CAST(:empresa AS BIGINT))
+              AND (:status IS NULL OR r.status = :status)
             ORDER BY r.dt_geracao DESC
             """,
             nativeQuery = true)
@@ -33,6 +33,6 @@ public interface ListarArquivosRaasRepository extends JpaRepository<ListarArquiv
             @Param("mes") Integer mes,
             @Param("ano") Integer ano,
             @Param("empresa") String empresa,
-            @Param("statusList") List<String> statusList
+            @Param("status") Integer status
     );
 }
