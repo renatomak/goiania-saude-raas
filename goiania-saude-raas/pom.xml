@@ -27,6 +27,13 @@
     </properties>
 
     <dependencies>
+            <!-- Fixture Factory for test data generation -->
+            <dependency>
+                <groupId>br.com.six2six</groupId>
+                <artifactId>fixture-factory</artifactId>
+                <version>3.1.0</version>
+                <scope>test</scope>
+            </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
