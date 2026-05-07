@@ -1,0 +1,35 @@
+package br.gov.goiania.saude.raas.infrastructure.adapter.in.web;
+
+import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasRequest;
+import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasResponse;
+import br.gov.goiania.saude.raas.application.ports.in.ListarArquivosRaasUseCasePort;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/v1/raas")
+@RequiredArgsConstructor
+public class ListarArquivosRaasController {
+
+    private final ListarArquivosRaasUseCasePort listarRaasUseCase;
+
+    @GetMapping
+    public ResponseEntity<List<ListarArquivosRaasResponse>> listarRaas(
+            @Valid @RequestParam final Integer mes,
+            @RequestParam final Integer ano,
+            @RequestParam final String codigoEmpresa,
+            @RequestParam final List<String> situacao) {
+
+        final ListarArquivosRaasRequest request = new ListarArquivosRaasRequest(
+                mes, ano, codigoEmpresa, situacao);
+
+        return ResponseEntity.ok(listarRaasUseCase.execute(request));
+    }
+}
