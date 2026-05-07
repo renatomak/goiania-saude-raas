@@ -1,16 +1,18 @@
 package br.gov.goiania.saude.raas.application.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ListarArquivosRaasResponse(
-        Integer mes,
-        Integer ano,
-        LocalDate dataGeracao,
-        String codigoEmpresa,
-        String nomeEmpresa,
-        String path,
-        String status,
-        BigDecimal totalFolha
+        @Schema(description = "Mês de referência do arquivo RAAS") Integer mes,
+        @Schema(description = "Ano de referência do arquivo RAAS") Integer ano,
+        @Schema(description = "Data de geração do arquivo RAAS") LocalDate dataGeracao,
+        @Schema(description = "Código da empresa") String codigoEmpresa,
+        @Schema(description = "Nome da empresa") String nomeEmpresa,
+        @Schema(description = "Caminho do arquivo RAAS") String path,
+        @Schema(description = "Status do arquivo RAAS (3=GERADO, 6=CANCELADO)") String status,
+        @Schema(description = "Valor total da folha do arquivo RAAS") BigDecimal totalFolha
 ) {
 }
