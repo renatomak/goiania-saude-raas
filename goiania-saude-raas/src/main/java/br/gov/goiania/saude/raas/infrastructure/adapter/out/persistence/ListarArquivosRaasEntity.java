@@ -18,7 +18,6 @@ import java.time.LocalDate;
 @Table(name = "raas_processo")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class ListarArquivosRaasEntity {
 

@@ -1,4 +1,4 @@
-package br.gov.goiania.saude.raas.fixtures;
+package br.gov.goiania.saude.raas.mock;
 
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasResponse;
 

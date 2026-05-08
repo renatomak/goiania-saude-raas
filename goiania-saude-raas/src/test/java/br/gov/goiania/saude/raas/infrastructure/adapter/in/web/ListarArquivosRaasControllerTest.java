@@ -3,7 +3,7 @@ package br.gov.goiania.saude.raas.infrastructure.adapter.in.web;
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasRequest;
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasResponse;
 import br.gov.goiania.saude.raas.application.ports.in.ListarArquivosRaasUseCasePort;
-import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasResponseMock;
+import br.gov.goiania.saude.raas.mock.ListarArquivosRaasResponseMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

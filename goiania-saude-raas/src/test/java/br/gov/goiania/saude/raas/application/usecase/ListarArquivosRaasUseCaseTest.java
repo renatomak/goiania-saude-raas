@@ -4,7 +4,7 @@ import br.gov.goiania.saude.raas.application.ports.out.ListarArquivosRaasPort;
 import br.gov.goiania.saude.raas.domain.exception.ListarArquivosRaasNotFoundException;
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaasFiltro;
 import br.gov.goiania.saude.raas.domain.service.ListarArquivosRaasDomainService;
-import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasRequestMock;
+import br.gov.goiania.saude.raas.mock.ListarArquivosRaasRequestMock;
 import br.gov.goiania.saude.raas.infrastructure.mapper.ListarArquivosRaasMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

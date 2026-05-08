@@ -1,7 +1,7 @@
 package br.gov.goiania.saude.raas.infrastructure.mapper;
 
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaas;
-import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasMock;
+import br.gov.goiania.saude.raas.mock.ListarArquivosRaasMock;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
