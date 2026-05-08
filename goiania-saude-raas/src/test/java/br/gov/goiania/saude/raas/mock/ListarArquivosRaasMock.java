@@ -11,7 +11,8 @@ public final class ListarArquivosRaasMock {
     private ListarArquivosRaasMock() { }
 
     public static ListarArquivosRaas valido() {
-        return new ListarArquivosRaas (
+        return new ListarArquivosRaas(
+                1L,
                 5,
                 2026,
                 LocalDate.of(2026, 5, 7),

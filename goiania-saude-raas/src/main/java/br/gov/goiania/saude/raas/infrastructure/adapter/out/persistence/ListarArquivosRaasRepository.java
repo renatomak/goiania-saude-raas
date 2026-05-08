@@ -29,7 +29,7 @@ public interface ListarArquivosRaasRepository extends JpaRepository<ListarArquiv
             ORDER BY r.dt_geracao DESC
             """,
             nativeQuery = true)
-    List<ListarArquivosRaasEntity> buscarProcessosPorCompetenciaEmpresaEStatus(
+    List<ListarArquivosRaasProjection> buscarProcessosPorCompetenciaEmpresaEStatus(
             @Param("mes") Integer mes,
             @Param("ano") Integer ano,
             @Param("empresa") String empresa,

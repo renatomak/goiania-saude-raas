@@ -5,6 +5,7 @@ import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaasFiltro;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasEntityMock;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasFiltroMock;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasMock;
+import br.gov.goiania.saude.raas.mock.ListarArquivosRaasProjectionMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,23 +44,14 @@ class ListarArquivosRaasPersistenceAdapterTest {
     @Test
     @DisplayName("Deve retornar lista de arquivos quando filtros válidos")
     void deveRetornarListaDeArquivosQuandoFiltrosValidos() {
-        ListarArquivosRaasEntity entity = ListarArquivosRaasEntityMock.valido();
+        ListarArquivosRaasProjection projection = ListarArquivosRaasProjectionMock.valido();
         ListarArquivosRaas domain = ListarArquivosRaasMock.valido();
-        when(repository.buscarProcessosPorCompetenciaEmpresaEStatus(any(), any(), any(), any())).thenReturn(List.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(domain);
+        when(repository.buscarProcessosPorCompetenciaEmpresaEStatus(any(), any(), any(), any())).thenReturn(List.of(projection));
+        when(mapper.toDomain(projection)).thenReturn(domain);
         List<ListarArquivosRaas> resultado = adapter.execute(filtroMock);
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals(domain, resultado.get(0));
-        assertEquals(1L, entity.getId());
-        assertEquals(5, entity.getMes());
-        assertEquals(2026, entity.getAno());
-        assertEquals(LocalDate.of(2026, 5, 7), entity.getDataGeracao());
-        assertEquals("123", entity.getCodigoEmpresa());
-        assertEquals("Empresa Teste", entity.getNomeEmpresa());
-        assertEquals("/caminho/arquivo.txt", entity.getPath());
-        assertEquals("3", entity.getStatus());
-        assertEquals(new BigDecimal("100.00"), entity.getTotalFolha());
     }
 
     @Test

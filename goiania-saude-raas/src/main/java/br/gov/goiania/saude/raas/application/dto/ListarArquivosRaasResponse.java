@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ListarArquivosRaasResponse(
+        Long id,
         @Schema(description = "Mês de referência do arquivo RAAS") Integer mes,
         @Schema(description = "Ano de referência do arquivo RAAS") Integer ano,
         @Schema(description = "Data de geração do arquivo RAAS") LocalDate dataGeracao,

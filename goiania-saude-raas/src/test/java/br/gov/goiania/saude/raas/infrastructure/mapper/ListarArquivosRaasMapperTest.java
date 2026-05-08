@@ -15,6 +15,7 @@ class ListarArquivosRaasMapperTest {
     void toResponseDeveManterIntegridadeDosDados() {
         ListarArquivosRaas domain = ListarArquivosRaasMock.valido();
         var response = mapper.toResponse(domain);
+        assertEquals(domain.getId(), response.id());
         assertEquals(domain.getCodigoEmpresa(), response.codigoEmpresa());
         assertEquals(domain.getNomeEmpresa(), response.nomeEmpresa());
         assertEquals(domain.getDataGeracao(), response.dataGeracao());

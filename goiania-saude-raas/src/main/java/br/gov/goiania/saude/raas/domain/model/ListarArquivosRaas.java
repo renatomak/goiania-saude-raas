@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ListarArquivosRaas {
 
+    private final Long id;
     private final Integer mes;
     private final Integer ano;
     private final LocalDate dataGeracao;

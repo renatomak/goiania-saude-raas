@@ -12,6 +12,7 @@ public final class ListarArquivosRaasResponseMock {
 
     public static ListarArquivosRaasResponse valido() {
         return new ListarArquivosRaasResponse(
+                1L,
                 5,
                 2026,
                 LocalDate.of(2026, 5, 7),
