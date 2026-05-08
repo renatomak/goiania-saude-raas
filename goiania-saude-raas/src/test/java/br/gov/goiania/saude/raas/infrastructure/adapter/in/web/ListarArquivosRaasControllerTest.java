@@ -3,6 +3,7 @@ package br.gov.goiania.saude.raas.infrastructure.adapter.in.web;
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasRequest;
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasResponse;
 import br.gov.goiania.saude.raas.application.ports.in.ListarArquivosRaasUseCasePort;
+import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasResponseMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,12 +11,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -35,13 +36,17 @@ class ListarArquivosRaasControllerTest {
     @Test
     @DisplayName("Deve retornar lista de arquivos quando filtros são válidos")
     void deveRetornarListaDeArquivosQuandoFiltrosValidos() {
-        ListarArquivosRaasResponse response = new ListarArquivosRaasResponse(5, 2026, LocalDate.of(2026, 5, 7), "123", "Empresa Teste", "/caminho/arquivo.txt", "3", new BigDecimal("100.00"));
+
+        ListarArquivosRaasResponse response = ListarArquivosRaasResponseMock.valido();
+
         when(useCasePort.execute(any(ListarArquivosRaasRequest.class))).thenReturn(List.of(response));
-        ResponseEntity<List<ListarArquivosRaasResponse>> result = controller.listarRaas(5, 2026, "123", 3);
-        assertEquals(200, result.getStatusCodeValue());
+
+        var result = controller.listarRaas(5, 2026, "123", 3);
+
+        assertEquals(200, result.getStatusCode().value());
         assertNotNull(result.getBody());
         assertEquals(1, result.getBody().size());
-        assertEquals("123", result.getBody().get(0).codigoEmpresa());
+        assertEquals(response, result.getBody().getFirst());
     }
 
     @Test
@@ -54,4 +59,3 @@ class ListarArquivosRaasControllerTest {
         assertTrue(result.getBody().isEmpty());
     }
 }
-

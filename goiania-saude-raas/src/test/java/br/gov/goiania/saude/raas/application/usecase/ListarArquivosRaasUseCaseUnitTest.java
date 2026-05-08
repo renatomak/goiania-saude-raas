@@ -4,8 +4,8 @@ import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasRequest;
 import br.gov.goiania.saude.raas.application.ports.out.ListarArquivosRaasPort;
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaas;
 import br.gov.goiania.saude.raas.domain.service.ListarArquivosRaasDomainService;
-import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasFixture;
-import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasRequestFixture;
+import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasMock;
+import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasRequestMock;
 import br.gov.goiania.saude.raas.infrastructure.mapper.ListarArquivosRaasMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,8 @@ class ListarArquivosRaasUseCaseUnitTest {
 
     @Test
     void listarDeveriaRetornarListaQuandoExistemDados() {
-        List<ListarArquivosRaas> processos = ListarArquivosRaasFixture.listaPopular();
-        ListarArquivosRaasRequest request = ListarArquivosRaasRequestFixture.valido();
+        List<ListarArquivosRaas> processos = ListarArquivosRaasMock.listaPopular();
+        ListarArquivosRaasRequest request = ListarArquivosRaasRequestMock.valido();
         when(repositoryPort.execute(any())).thenReturn(processos);
         when(mapper.toResponse(any())).thenReturn(null);
         assertDoesNotThrow(() -> useCase.execute(request));
@@ -44,14 +44,14 @@ class ListarArquivosRaasUseCaseUnitTest {
 
     @Test
     void listarDeveriaRetornarListaVaziaQuandoNaoHouverDadosNoPeriodo() {
-        ListarArquivosRaasRequest request = ListarArquivosRaasRequestFixture.valido();
+        ListarArquivosRaasRequest request = ListarArquivosRaasRequestMock.valido();
         when(repositoryPort.execute(any())).thenReturn(Collections.emptyList());
         assertThrows(Exception.class, () -> useCase.execute(request));
     }
 
     @Test
     void listarDeveriaPropagarExcecaoQuandoRepositoryFalha() {
-        ListarArquivosRaasRequest request = ListarArquivosRaasRequestFixture.valido();
+        ListarArquivosRaasRequest request = ListarArquivosRaasRequestMock.valido();
         when(repositoryPort.execute(any())).thenThrow(new RuntimeException("Erro de banco"));
         assertThrows(RuntimeException.class, () -> useCase.execute(request));
     }

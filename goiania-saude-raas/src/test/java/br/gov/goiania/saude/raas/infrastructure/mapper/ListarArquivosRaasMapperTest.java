@@ -1,7 +1,7 @@
 package br.gov.goiania.saude.raas.infrastructure.mapper;
 
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaas;
-import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasFixture;
+import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasMock;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
@@ -13,7 +13,7 @@ class ListarArquivosRaasMapperTest {
 
     @Test
     void toResponseDeveManterIntegridadeDosDados() {
-        ListarArquivosRaas domain = ListarArquivosRaasFixture.valido();
+        ListarArquivosRaas domain = ListarArquivosRaasMock.valido();
         var response = mapper.toResponse(domain);
         assertEquals(domain.getCodigoEmpresa(), response.codigoEmpresa());
         assertEquals(domain.getNomeEmpresa(), response.nomeEmpresa());

@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public final class ListarArquivosRaasFixture {
+public final class ListarArquivosRaasMock {
 
-    private ListarArquivosRaasFixture() { }
+    private ListarArquivosRaasMock() { }
 
     public static ListarArquivosRaas valido() {
-        return new ListarArquivosRaas(
+        return new ListarArquivosRaas (
                 5,
                 2026,
                 LocalDate.of(2026, 5, 7),

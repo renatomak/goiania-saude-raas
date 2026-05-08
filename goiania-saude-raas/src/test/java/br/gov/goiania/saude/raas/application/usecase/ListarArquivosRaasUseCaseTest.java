@@ -4,7 +4,7 @@ import br.gov.goiania.saude.raas.application.ports.out.ListarArquivosRaasPort;
 import br.gov.goiania.saude.raas.domain.exception.ListarArquivosRaasNotFoundException;
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaasFiltro;
 import br.gov.goiania.saude.raas.domain.service.ListarArquivosRaasDomainService;
-import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasRequestFixture;
+import br.gov.goiania.saude.raas.fixtures.ListarArquivosRaasRequestMock;
 import br.gov.goiania.saude.raas.infrastructure.mapper.ListarArquivosRaasMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class ListarArquivosRaasUseCaseTest {
         when(repositoryPort.execute(any(ListarArquivosRaasFiltro.class)))
                 .thenReturn(Collections.emptyList());
 
-        assertThatThrownBy(() -> useCase.execute(ListarArquivosRaasRequestFixture.notFound()))
+        assertThatThrownBy(() -> useCase.execute(ListarArquivosRaasRequestMock.notFound()))
                 .isInstanceOf(ListarArquivosRaasNotFoundException.class)
                 .hasMessageContaining("999");
     }
