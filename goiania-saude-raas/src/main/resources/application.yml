@@ -1,6 +1,8 @@
 spring:
   application:
     name: goiania-saude-raas
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   datasource:
     url: ${DB_URL:jdbc:postgresql://10.52.31.100:5432/goiania_saude}
     username: ${DB_USERNAME:sictec_sms}
@@ -31,5 +33,5 @@ logging:
   level:
     br.gov.goiania.saude.raas: INFO
     org.springframework.web: WARN
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
