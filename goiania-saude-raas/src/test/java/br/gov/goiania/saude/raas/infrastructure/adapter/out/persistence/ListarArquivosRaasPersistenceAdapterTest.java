@@ -2,7 +2,10 @@ package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence;
 
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaas;
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaasFiltro;
-import br.gov.goiania.saude.raas.mock.ListarArquivosRaasEntityMock;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasPersistenceAdapter;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasProjection;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasRepository;
+import br.gov.goiania.saude.raas.mock.ArquivosRaasEntityMock;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasFiltroMock;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasMock;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasProjectionMock;
@@ -66,7 +69,7 @@ class ListarArquivosRaasPersistenceAdapterTest {
     @Test
     @DisplayName("Deve criar e acessar todos os campos de ListarArquivosRaasEntity")
     void deveCriarEAcessarTodosOsCamposDeListarArquivosRaasEntity() {
-        ListarArquivosRaasEntity entity = ListarArquivosRaasEntityMock.exemplo();
+        ArquivosRaasEntity entity = ArquivosRaasEntityMock.exemplo();
         assertEquals(2L, entity.getId());
         assertEquals(6, entity.getMes());
         assertEquals(2027, entity.getAno());

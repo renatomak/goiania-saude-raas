@@ -1,12 +1,13 @@
-package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence;
+package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar;
 
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.ArquivosRaasEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ListarArquivosRaasRepository extends JpaRepository<ListarArquivosRaasEntity, Long> {
+public interface ListarArquivosRaasRepository extends JpaRepository<ArquivosRaasEntity, Long> {
 
     @Query(value = """
             SELECT

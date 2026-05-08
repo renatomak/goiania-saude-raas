@@ -1,4 +1,4 @@
-package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence;
+package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar;
 
 import br.gov.goiania.saude.raas.application.ports.out.ListarArquivosRaasPort;
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaas;

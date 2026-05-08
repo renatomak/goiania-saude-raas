@@ -1,16 +1,16 @@
 package br.gov.goiania.saude.raas.mock;
 
-import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.ListarArquivosRaasEntity;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.ArquivosRaasEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public final class ListarArquivosRaasEntityMock {
+public final class ArquivosRaasEntityMock {
 
-    private ListarArquivosRaasEntityMock() { }
+    private ArquivosRaasEntityMock() { }
 
-    public static ListarArquivosRaasEntity valido() {
-        return new ListarArquivosRaasEntity(
+    public static ArquivosRaasEntity valido() {
+        return new ArquivosRaasEntity(
                 1L,
                 5,
                 2026,
@@ -19,12 +19,13 @@ public final class ListarArquivosRaasEntityMock {
                 "Empresa Teste",
                 "/caminho/arquivo.txt",
                 "3",
-                new BigDecimal("100.00")
+                new BigDecimal("100.00"),
+                "textoExemplo"
         );
     }
 
-    public static ListarArquivosRaasEntity exemplo() {
-        return new ListarArquivosRaasEntity(
+    public static ArquivosRaasEntity exemplo() {
+        return new ArquivosRaasEntity(
                 2L,
                 6,
                 2027,
@@ -33,7 +34,8 @@ public final class ListarArquivosRaasEntityMock {
                 "Empresa Exemplo",
                 "/outro/caminho/arquivo.txt",
                 "4",
-                new BigDecimal("200.00")
+                new BigDecimal("200.00"),
+                "textoExemplo"
         );
     }
 }

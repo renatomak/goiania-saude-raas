@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ListarArquivosRaasEntity {
+public class ArquivosRaasEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,4 +50,8 @@ public class ListarArquivosRaasEntity {
 
     @Column(name = "total_folha", precision = 15, scale = 2)
     private BigDecimal totalFolha;
+
+    @Column(name = "texto")
+    private String texto;
+
 }
