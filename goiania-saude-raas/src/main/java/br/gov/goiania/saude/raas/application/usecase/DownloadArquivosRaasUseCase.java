@@ -5,7 +5,9 @@ import br.gov.goiania.saude.raas.application.ports.in.DownloadArquivosRaasUseCas
 import br.gov.goiania.saude.raas.application.ports.out.DownloadArquivosRaasPort;
 import br.gov.goiania.saude.raas.infrastructure.mapper.DownloadArquivosRaasMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 public class DownloadArquivosRaasUseCase implements DownloadArquivosRaasUseCasePort {
 

@@ -7,9 +7,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.servlet.config.annotation.CorsRegistration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WebConfigTest {
@@ -27,5 +33,24 @@ class WebConfigTest {
         webConfig.addInterceptors(registry);
         verify(registry).addInterceptor(loggingInterceptor);
         assertNotNull(webConfig);
+    }
+
+    @Test
+    @DisplayName("Deve registrar configuracao CORS global")
+    void deveRegistrarConfiguracaoCorsGlobal() {
+        CorsRegistry registry = org.mockito.Mockito.mock(CorsRegistry.class);
+        CorsRegistration registration = org.mockito.Mockito.mock(CorsRegistration.class);
+        when(registry.addMapping("/**")).thenReturn(registration);
+        when(registration.allowedOriginPatterns(any(String[].class))).thenReturn(registration);
+        when(registration.allowedMethods(any(String[].class))).thenReturn(registration);
+        when(registration.allowedHeaders(any(String[].class))).thenReturn(registration);
+        when(registration.exposedHeaders(any(String[].class))).thenReturn(registration);
+        when(registration.allowCredentials(anyBoolean())).thenReturn(registration);
+        when(registration.maxAge(anyLong())).thenReturn(registration);
+
+        webConfig.addCorsMappings(registry);
+
+        verify(registry).addMapping("/**");
+        verify(registration).allowedOriginPatterns("*");
     }
 }
