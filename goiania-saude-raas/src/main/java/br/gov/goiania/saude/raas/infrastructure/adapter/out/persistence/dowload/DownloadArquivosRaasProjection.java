@@ -8,6 +8,8 @@ public interface DownloadArquivosRaasProjection {
 
     LocalDate getDtGeracao();
 
+    String getPath();
+
     String getTexto();
 }
 

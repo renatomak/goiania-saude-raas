@@ -79,5 +79,13 @@ class ListarArquivosRaasPersistenceAdapterTest {
         assertEquals("/outro/caminho/arquivo.txt", entity.getPath());
         assertEquals("4", entity.getStatus());
         assertEquals(new BigDecimal("200.00"), entity.getTotalFolha());
+        assertEquals("textoExemplo", entity.getTexto());
+    }
+
+    @Test
+    @DisplayName("Deve criar instância com construtor protegido")
+    void deveCriarInstanciaComConstrutorProtegido() {
+        ArquivosRaasEntity entity = new ArquivosRaasEntity();
+        assertNotNull(entity);
     }
 }

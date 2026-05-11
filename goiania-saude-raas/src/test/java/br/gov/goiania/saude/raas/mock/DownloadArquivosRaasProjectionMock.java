@@ -23,6 +23,11 @@ public final class DownloadArquivosRaasProjectionMock {
         }
 
         @Override
+        public String getPath() {
+            return "/raas/arquivo_2025040018831729.txt";
+        }
+
+        @Override
         public String getTexto() {
             return "01#RAS#2025040018831729SECRETARIA MUNICIPAL DE SAÚDE 52087025141524000123SECRETARIA MUNICIPAL DE SAÚDE DE GOIANIAM20\n";
         }

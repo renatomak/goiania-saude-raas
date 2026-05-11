@@ -10,14 +10,15 @@ public interface DownloadArquivosRaasRepository extends JpaRepository<ArquivosRa
     @Query(value = """
             SELECT
                 r.cd_raas_processo,
+                r.dt_geracao,
                 r.path,
-                r.texto AS conteudo_arquivo
+                r.texto
             FROM raas_processo r
             LEFT JOIN empresa e ON e.empresa = r.empresa
             WHERE r.cd_raas_processo = :id
             """,
             nativeQuery = true)
     DownloadArquivosRaasProjection download(
-            @Param("cd_raas_processo") Long id
+            @Param("id") Long id
     );
 }
