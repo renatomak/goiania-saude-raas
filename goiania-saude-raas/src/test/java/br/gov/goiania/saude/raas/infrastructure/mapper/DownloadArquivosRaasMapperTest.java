@@ -24,9 +24,9 @@ class DownloadArquivosRaasMapperTest {
         var response = mapper.toResponse(domain);
 
         assertEquals(domain.getId(), response.id());
-        assertEquals(domain.getPath(), response.path());
+        assertEquals(domain.getNome(), response.nome());
         assertEquals(domain.getDataGeracao(), response.dataGeracao());
-        assertEquals(domain.getTexto(), response.texto());
+        assertEquals(domain.getArquivo(), response.arquivo());
     }
 
     @Test
@@ -36,9 +36,9 @@ class DownloadArquivosRaasMapperTest {
         var response = mapper.toResponse(domain);
 
         assertEquals(1L, response.id());
-        assertNotNull(response.path());
+        assertNotNull(response.nome());
         assertNotNull(response.dataGeracao());
-        assertNotNull(response.texto());
+        assertNotNull(response.arquivo());
     }
 
     @Test
@@ -64,19 +64,16 @@ class DownloadArquivosRaasMapperTest {
                     public Long getId() {
                         return null;
                     }
-
                     @Override
-                    public LocalDate getDtGeracao() {
+                    public LocalDate getDataGeracao() {
                         return null;
                     }
-
                     @Override
-                    public String getPath() {
+                    public String getNome() {
                         return null;
                     }
-
                     @Override
-                    public String getTexto() {
+                    public String getArquivo() {
                         return null;
                     }
                 };
@@ -85,8 +82,8 @@ class DownloadArquivosRaasMapperTest {
 
         assertNull(domain.getId());
         assertNull(domain.getDataGeracao());
-        assertNull(domain.getPath());
-        assertNull(domain.getTexto());
+        assertNull(domain.getNome());
+        assertNull(domain.getArquivo());
     }
 
     @Test
@@ -99,8 +96,8 @@ class DownloadArquivosRaasMapperTest {
 
         assertNull(response.id());
         assertNull(response.dataGeracao());
-        assertNull(response.path());
-        assertNull(response.texto());
+        assertNull(response.nome());
+        assertNull(response.arquivo());
     }
 
     private void assertNotNull(Object obj) {

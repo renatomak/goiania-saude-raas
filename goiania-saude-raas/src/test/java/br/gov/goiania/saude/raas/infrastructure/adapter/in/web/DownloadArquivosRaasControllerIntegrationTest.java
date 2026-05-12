@@ -57,8 +57,8 @@ class DownloadArquivosRaasControllerIntegrationTest {
         assertEquals(200, resultado.getStatusCode().value());
         assertNotNull(resultado.getBody());
         assertNotNull(resultado.getBody().id());
-        assertNotNull(resultado.getBody().path());
-        assertNotNull(resultado.getBody().texto());
+        assertNotNull(resultado.getBody().nome());
+        assertNotNull(resultado.getBody().arquivo());
         assertNotNull(resultado.getBody().dataGeracao());
     }
 }

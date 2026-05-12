@@ -22,6 +22,8 @@ class DownloadArquivosRaasResponseTest {
         String json = mapper.writeValueAsString(response);
 
         assertTrue(json.contains("\"dataGeracao\":\"07/05/2026\""));
+        assertTrue(json.contains("\"nome\":"));
+        assertTrue(json.contains("\"arquivo\":"));
     }
 }
 

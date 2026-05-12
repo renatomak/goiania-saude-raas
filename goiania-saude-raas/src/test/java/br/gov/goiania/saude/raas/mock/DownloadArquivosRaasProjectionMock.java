@@ -18,17 +18,17 @@ public final class DownloadArquivosRaasProjectionMock {
         }
 
         @Override
-        public LocalDate getDtGeracao() {
+        public LocalDate getDataGeracao() {
             return LocalDate.of(2026, 5, 7);
         }
 
         @Override
-        public String getPath() {
+        public String getNome() {
             return "/raas/arquivo_2025040018831729.txt";
         }
 
         @Override
-        public String getTexto() {
+        public String getArquivo() {
             return "01#RAS#2025040018831729SECRETARIA MUNICIPAL DE SAÚDE 52087025141524000123SECRETARIA MUNICIPAL DE SAÚDE DE GOIANIAM20\n";
         }
     }

@@ -10,7 +10,7 @@ public record DownloadArquivosRaasResponse(
         @Schema(description = "Data de geração do arquivo RAAS", example = "07/05/2026")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate dataGeracao,
-        @Schema(description = "Caminho do arquivo RAAS") String path,
-        @Schema(description = "Texto do arquivo RAAS") String texto
+        @Schema(description = "Nome do arquivo RAAS") String nome,
+        @Schema(description = "Conteúdo do arquivo RAAS") String arquivo
 ) {
 }

@@ -61,8 +61,8 @@ class DownloadArquivosRaasPersistenceAdapterTest {
         DownloadArquivosRaas resultado = adapter.execute(1L);
 
         assertEquals(1L, resultado.getId());
-        assertNotNull(resultado.getPath());
-        assertNotNull(resultado.getTexto());
+        assertNotNull(resultado.getNome());
+        assertNotNull(resultado.getArquivo());
         assertNotNull(resultado.getDataGeracao());
     }
 

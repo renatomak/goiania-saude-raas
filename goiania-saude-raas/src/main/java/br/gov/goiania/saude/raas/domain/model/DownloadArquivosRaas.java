@@ -13,6 +13,6 @@ public class DownloadArquivosRaas {
 
     private final Long id;
     private final LocalDate dataGeracao;
-    private final String path;
-    private final String texto;
+    private final String nome;
+    private final String arquivo;
 }

@@ -9,10 +9,10 @@ public interface DownloadArquivosRaasRepository extends JpaRepository<ArquivosRa
 
     @Query(value = """
             SELECT
-                r.cd_raas_processo,
-                r.dt_geracao,
-                r.path,
-                r.texto
+                r.cd_raas_processo AS id,
+                r.dt_geracao AS dataGeracao,
+                r.path AS nome,
+                r.texto AS arquivos
             FROM raas_processo r
             LEFT JOIN empresa e ON e.empresa = r.empresa
             WHERE r.cd_raas_processo = :id
