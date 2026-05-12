@@ -2,7 +2,7 @@ package br.gov.goiania.saude.raas.infrastructure.adapter.in.web;
 
 import br.gov.goiania.saude.raas.application.dto.ListarUnidadesResponse;
 import br.gov.goiania.saude.raas.application.ports.in.ListarUnidadesUseCasePort;
-import br.gov.goiania.saude.raas.infrastructure.adapter.web.swagger.ListarUnidadesSwagger;
+import br.gov.goiania.saude.raas.infrastructure.adapter.in.web.swagger.ListarUnidadesSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

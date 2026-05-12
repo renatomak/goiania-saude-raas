@@ -1,5 +1,5 @@
 package br.gov.goiania.saude.raas.mock;
-import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasProjection;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.arquivos.ListarArquivosRaasProjection;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;

@@ -2,7 +2,7 @@ package br.gov.goiania.saude.raas.infrastructure.mapper;
 
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasResponse;
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaas;
-import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasProjection;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.arquivos.ListarArquivosRaasProjection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

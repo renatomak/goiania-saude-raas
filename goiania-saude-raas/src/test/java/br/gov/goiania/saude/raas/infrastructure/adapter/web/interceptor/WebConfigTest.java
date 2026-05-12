@@ -1,5 +1,7 @@
 package br.gov.goiania.saude.raas.infrastructure.adapter.web.interceptor;
 
+import br.gov.goiania.saude.raas.infrastructure.config.LoggingInterceptor;
+import br.gov.goiania.saude.raas.infrastructure.config.WebConfig;
 import br.gov.goiania.saude.raas.mock.InterceptorRegistryMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,7 @@ package br.gov.goiania.saude.raas.infrastructure.adapter.in.web;
 
 import br.gov.goiania.saude.raas.application.dto.DownloadArquivosRaasResponse;
 import br.gov.goiania.saude.raas.application.ports.in.DownloadArquivosRaasUseCasePort;
-import br.gov.goiania.saude.raas.infrastructure.adapter.web.swagger.DownloadArquivosRaasSwagger;
+import br.gov.goiania.saude.raas.infrastructure.adapter.in.web.swagger.DownloadArquivosRaasSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

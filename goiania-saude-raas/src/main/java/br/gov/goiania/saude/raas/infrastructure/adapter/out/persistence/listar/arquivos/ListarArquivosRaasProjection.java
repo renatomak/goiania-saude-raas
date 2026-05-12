@@ -1,4 +1,4 @@
-package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar;
+package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.arquivos;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

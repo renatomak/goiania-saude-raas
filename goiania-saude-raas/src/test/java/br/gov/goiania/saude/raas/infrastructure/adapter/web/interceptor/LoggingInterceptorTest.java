@@ -1,5 +1,6 @@
 package br.gov.goiania.saude.raas.infrastructure.adapter.web.interceptor;
 
+import br.gov.goiania.saude.raas.infrastructure.config.LoggingInterceptor;
 import br.gov.goiania.saude.raas.mock.HttpServletMock;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package br.gov.goiania.saude.raas.infrastructure.adapter.web.swagger;
+package br.gov.goiania.saude.raas.infrastructure.adapter.in.web.swagger;
 
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasResponse;
 import io.swagger.v3.oas.annotations.Operation;

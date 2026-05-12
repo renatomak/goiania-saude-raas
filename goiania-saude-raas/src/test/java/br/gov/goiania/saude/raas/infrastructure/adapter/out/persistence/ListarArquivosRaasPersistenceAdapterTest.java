@@ -2,9 +2,9 @@ package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence;
 
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaas;
 import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaasFiltro;
-import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasPersistenceAdapter;
-import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasProjection;
-import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.ListarArquivosRaasRepository;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.arquivos.ListarArquivosRaasPersistenceAdapter;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.arquivos.ListarArquivosRaasProjection;
+import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.arquivos.ListarArquivosRaasRepository;
 import br.gov.goiania.saude.raas.mock.ArquivosRaasEntityMock;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasFiltroMock;
 import br.gov.goiania.saude.raas.mock.ListarArquivosRaasMock;

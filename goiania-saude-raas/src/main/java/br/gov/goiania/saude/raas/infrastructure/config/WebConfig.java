@@ -1,4 +1,4 @@
-package br.gov.goiania.saude.raas.infrastructure.adapter.web.interceptor;
+package br.gov.goiania.saude.raas.infrastructure.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar;
+package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.listar.arquivos;
 
 import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.ArquivosRaasEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
