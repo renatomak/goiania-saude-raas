@@ -12,7 +12,7 @@ public interface DownloadArquivosRaasRepository extends JpaRepository<ArquivosRa
                 r.cd_raas_processo AS id,
                 r.dt_geracao AS dataGeracao,
                 r.path AS nome,
-                r.texto AS arquivos
+                r.texto AS arquivo
             FROM raas_processo r
             LEFT JOIN empresa e ON e.empresa = r.empresa
             WHERE r.cd_raas_processo = :id
