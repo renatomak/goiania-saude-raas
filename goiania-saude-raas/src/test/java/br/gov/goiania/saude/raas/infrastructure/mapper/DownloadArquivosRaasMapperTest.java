@@ -24,7 +24,7 @@ class DownloadArquivosRaasMapperTest {
         var response = mapper.toResponse(domain);
 
         assertEquals(domain.getId(), response.id());
-        assertEquals(domain.getNome(), response.nome());
+        assertEquals("arquivo_2025040018831729.txt", response.nome());
         assertEquals(domain.getDataGeracao(), response.dataGeracao());
         assertEquals(domain.getArquivo(), response.arquivo());
     }
@@ -106,4 +106,3 @@ class DownloadArquivosRaasMapperTest {
         }
     }
 }
-

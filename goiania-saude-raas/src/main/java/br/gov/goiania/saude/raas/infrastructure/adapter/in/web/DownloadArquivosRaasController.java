@@ -1,7 +1,7 @@
 package br.gov.goiania.saude.raas.infrastructure.adapter.in.web;
 
 import br.gov.goiania.saude.raas.application.dto.DownloadArquivosRaasResponse;
-import br.gov.goiania.saude.raas.application.ports.in.DownloadArquivosRaasUseCasePort;
+import br.gov.goiania.saude.raas.application.ports.in.DownloadArquivosRaasPortIn;
 import br.gov.goiania.saude.raas.infrastructure.adapter.in.web.swagger.DownloadArquivosRaasSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DownloadArquivosRaasController implements DownloadArquivosRaasSwagger {
 
-    private final DownloadArquivosRaasUseCasePort downloadRaasUseCase;
+    private final DownloadArquivosRaasPortIn downloadRaasUseCase;
 
     @GetMapping("/{id}")
     @Override

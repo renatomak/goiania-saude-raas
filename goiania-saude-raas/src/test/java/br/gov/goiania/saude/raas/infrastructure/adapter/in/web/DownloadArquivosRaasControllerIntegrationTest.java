@@ -1,7 +1,7 @@
 package br.gov.goiania.saude.raas.infrastructure.adapter.in.web;
 
 import br.gov.goiania.saude.raas.application.dto.DownloadArquivosRaasResponse;
-import br.gov.goiania.saude.raas.application.ports.in.DownloadArquivosRaasUseCasePort;
+import br.gov.goiania.saude.raas.application.ports.in.DownloadArquivosRaasPortIn;
 import br.gov.goiania.saude.raas.mock.DownloadArquivosRaasResponseMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 class DownloadArquivosRaasControllerIntegrationTest {
 
     @Mock
-    private DownloadArquivosRaasUseCasePort useCasePort;
+    private DownloadArquivosRaasPortIn useCasePort;
 
     private DownloadArquivosRaasController controller;
 
