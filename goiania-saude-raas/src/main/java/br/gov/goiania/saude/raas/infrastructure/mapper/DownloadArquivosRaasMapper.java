@@ -21,7 +21,7 @@ public interface DownloadArquivosRaasMapper {
         if (nome == null) {
             return null;
         }
-        return nome.replace("raas/", "");
+        return nome.replaceFirst("^/?raas/", "");
     }
 
 }
