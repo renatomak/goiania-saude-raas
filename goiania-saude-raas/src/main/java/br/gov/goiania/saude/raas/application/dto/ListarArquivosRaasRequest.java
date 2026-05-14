@@ -1,9 +1,12 @@
 package br.gov.goiania.saude.raas.application.dto;
 
+
 public record ListarArquivosRaasRequest(
         Integer mes,
         Integer ano,
         String codigoEmpresa,
-        Integer situacao
+        Integer situacao,
+        Integer page,
+        Integer size
 ) {
 }

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/raas")
@@ -22,15 +22,15 @@ public class ListarArquivosRaasController implements ListarArquivosRaasSwagger {
 
     @GetMapping
     @Override
-    public ResponseEntity<List<ListarArquivosRaasResponse>> listarRaas(
+    public ResponseEntity<Page<ListarArquivosRaasResponse>> listarRaas(
             @RequestParam(required = false) final Integer mes,
             @RequestParam(required = false) final Integer ano,
             @RequestParam(required = false) final String codigoEmpresa,
-            @RequestParam(required = false) final Integer situacao) {
-
+            @RequestParam(required = false) final Integer situacao,
+            @RequestParam(required = false, defaultValue = "0") final Integer page,
+            @RequestParam(required = false, defaultValue = "10") final Integer size) {
         final ListarArquivosRaasRequest request = new ListarArquivosRaasRequest(
-                mes, ano, codigoEmpresa, situacao);
-
+                mes, ano, codigoEmpresa, situacao, page, size);
         return ResponseEntity.ok(listarRaasUseCase.execute(request));
     }
 }

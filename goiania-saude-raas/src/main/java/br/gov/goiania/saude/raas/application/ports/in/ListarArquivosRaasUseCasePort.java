@@ -2,10 +2,9 @@ package br.gov.goiania.saude.raas.application.ports.in;
 
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasRequest;
 import br.gov.goiania.saude.raas.application.dto.ListarArquivosRaasResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ListarArquivosRaasUseCasePort {
 
-    List<ListarArquivosRaasResponse> execute(ListarArquivosRaasRequest request);
+    Page<ListarArquivosRaasResponse> execute(ListarArquivosRaasRequest request);
 }

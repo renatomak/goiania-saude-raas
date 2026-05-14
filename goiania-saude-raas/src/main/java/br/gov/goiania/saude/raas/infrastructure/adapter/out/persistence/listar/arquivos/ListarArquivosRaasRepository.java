@@ -4,8 +4,9 @@ import br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.Arquivos
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface ListarArquivosRaasRepository extends JpaRepository<ArquivosRaasEntity, Long> {
 
@@ -29,11 +30,22 @@ public interface ListarArquivosRaasRepository extends JpaRepository<ArquivosRaas
               AND (:status IS NULL OR r.status = :status)
             ORDER BY r.dt_geracao DESC
             """,
+            countQuery = """
+            SELECT COUNT(*)
+            FROM raas_processo r
+            LEFT JOIN empresa e ON e.empresa = r.empresa
+            WHERE r.total_folha > 0
+              AND (:mes IS NULL OR r.mes = :mes)
+              AND (:ano IS NULL OR r.ano = :ano)
+              AND (:empresa IS NULL OR r.empresa = CAST(:empresa AS BIGINT))
+              AND (:status IS NULL OR r.status = :status)
+            """,
             nativeQuery = true)
-    List<ListarArquivosRaasProjection> buscarProcessosPorCompetenciaEmpresaEStatus(
+    Page<ListarArquivosRaasProjection> buscarProcessosPorCompetenciaEmpresaEStatus(
             @Param("mes") Integer mes,
             @Param("ano") Integer ano,
             @Param("empresa") String empresa,
-            @Param("status") Integer status
+            @Param("status") Integer status,
+            Pageable pageable
     );
 }

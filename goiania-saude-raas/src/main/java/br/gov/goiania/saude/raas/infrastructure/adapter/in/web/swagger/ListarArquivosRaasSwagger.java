@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 
 @Tag(name = "RAAS", description = "Operações de consulta de arquivos RAAS")
 public interface ListarArquivosRaasSwagger {
@@ -21,11 +21,12 @@ public interface ListarArquivosRaasSwagger {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
         }
     )
-    ResponseEntity<List<ListarArquivosRaasResponse>> listarRaas(
+    ResponseEntity<Page<ListarArquivosRaasResponse>> listarRaas(
         @Parameter(description = "Mês de referência do arquivo") Integer mes,
         @Parameter(description = "Ano de referência do arquivo") Integer ano,
         @Parameter(description = "Código da empresa") String codigoEmpresa,
-        @Parameter(description = "Situação do arquivo: 3 para GERADO, 6 para CANCELADO") Integer situacao
+        @Parameter(description = "Situação do arquivo: 3 para GERADO, 6 para CANCELADO") Integer situacao,
+        @Parameter(description = "Número da página") Integer page,
+        @Parameter(description = "Tamanho da página") Integer size
     );
 }
-

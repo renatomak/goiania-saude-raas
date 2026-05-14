@@ -2,7 +2,6 @@ package br.gov.goiania.saude.raas.infrastructure.config;
 
 import br.gov.goiania.saude.raas.application.ports.out.ListarArquivosRaasPort;
 import br.gov.goiania.saude.raas.application.usecase.ListarArquivosRaasUseCase;
-import br.gov.goiania.saude.raas.domain.service.ListarArquivosRaasDomainService;
 import br.gov.goiania.saude.raas.infrastructure.mapper.ListarArquivosRaasMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,12 +24,6 @@ class BeanConfigurationTest {
     @InjectMocks
     private BeanConfiguration beanConfiguration;
 
-    @Test
-    @DisplayName("Deve criar o bean ListarArquivosRaasDomainService corretamente")
-    void deveCriarBeanListarArquivosRaasDomainService() {
-        ListarArquivosRaasDomainService service = beanConfiguration.raasDomainService();
-        assertNotNull(service);
-    }
 
     @Test
     @DisplayName("Deve criar o bean ListarArquivosRaasUseCasePort corretamente")
@@ -40,4 +33,3 @@ class BeanConfigurationTest {
         verifyNoInteractions(repositoryPort, mapper);
     }
 }
-

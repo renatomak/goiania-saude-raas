@@ -10,8 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,25 +37,23 @@ class ListarArquivosRaasControllerTest {
     @Test
     @DisplayName("Deve retornar lista de arquivos quando filtros são válidos")
     void deveRetornarListaDeArquivosQuandoFiltrosValidos() {
-
         ListarArquivosRaasResponse response = ListarArquivosRaasResponseMock.valido();
-
-        when(useCasePort.execute(any(ListarArquivosRaasRequest.class))).thenReturn(List.of(response));
-
-        var result = controller.listarRaas(5, 2026, "123", 3);
-
+        Page<ListarArquivosRaasResponse> page = new PageImpl<>(List.of(response));
+        when(useCasePort.execute(any(ListarArquivosRaasRequest.class))).thenReturn(page);
+        var result = controller.listarRaas(5, 2026, "123", 3, 0, 10);
         assertEquals(200, result.getStatusCode().value());
         assertNotNull(result.getBody());
-        assertEquals(1, result.getBody().size());
-        assertEquals(response, result.getBody().getFirst());
+        assertEquals(1, result.getBody().getContent().size());
+        assertEquals(response, result.getBody().getContent().get(0));
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não houver resultados")
     void deveRetornarListaVaziaQuandoSemResultados() {
-        when(useCasePort.execute(any(ListarArquivosRaasRequest.class))).thenReturn(Collections.emptyList());
-        ResponseEntity<List<ListarArquivosRaasResponse>> result = controller.listarRaas(null, null, null, null);
-        assertEquals(200, result.getStatusCodeValue());
+        Page<ListarArquivosRaasResponse> emptyPage = Page.empty();
+        when(useCasePort.execute(any(ListarArquivosRaasRequest.class))).thenReturn(emptyPage);
+        ResponseEntity<Page<ListarArquivosRaasResponse>> result = controller.listarRaas(null, null, null, null, 0, 10);
+        assertEquals(200, result.getStatusCode().value());
         assertNotNull(result.getBody());
         assertTrue(result.getBody().isEmpty());
     }

@@ -19,11 +19,15 @@ import br.gov.goiania.saude.raas.infrastructure.mapper.ListarArquivosRaasMapper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ListarArquivosRaasPersistenceAdapterTest {
@@ -39,6 +43,8 @@ class ListarArquivosRaasPersistenceAdapterTest {
     @InjectMocks
     private ListarArquivosRaasPersistenceAdapter adapter;
 
+    private static final Pageable pageable = PageRequest.of(0, 10);
+
     @BeforeEach
     void setUp() {
         filtroMock = ListarArquivosRaasFiltroMock.valido();
@@ -49,21 +55,25 @@ class ListarArquivosRaasPersistenceAdapterTest {
     void deveRetornarListaDeArquivosQuandoFiltrosValidos() {
         ListarArquivosRaasProjection projection = ListarArquivosRaasProjectionMock.valido();
         ListarArquivosRaas domain = ListarArquivosRaasMock.valido();
-        when(repository.buscarProcessosPorCompetenciaEmpresaEStatus(any(), any(), any(), any())).thenReturn(List.of(projection));
+        when(repository.buscarProcessosPorCompetenciaEmpresaEStatus(
+                any(), any(), any(), any(), any()
+        )).thenReturn(new PageImpl<>(List.of(projection)));
         when(mapper.toDomain(projection)).thenReturn(domain);
-        List<ListarArquivosRaas> resultado = adapter.execute(filtroMock);
+        Page<ListarArquivosRaas> resultado = adapter.execute(filtroMock, pageable);
         assertNotNull(resultado);
-        assertEquals(1, resultado.size());
-        assertEquals(domain, resultado.get(0));
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(domain, resultado.getContent().get(0));
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando repositório não encontra dados")
     void deveRetornarListaVaziaQuandoRepositorioNaoEncontraDados() {
-        when(repository.buscarProcessosPorCompetenciaEmpresaEStatus(any(), any(), any(), any())).thenReturn(List.of());
-        List<ListarArquivosRaas> resultado = adapter.execute(filtroMock);
+        when(repository.buscarProcessosPorCompetenciaEmpresaEStatus(
+                any(), any(), any(), any(), any()
+        )).thenReturn(new PageImpl<>(List.of()));
+        Page<ListarArquivosRaas> resultado = adapter.execute(filtroMock, pageable);
         assertNotNull(resultado);
-        assertEquals(0, resultado.size());
+        assertEquals(0, resultado.getTotalElements());
     }
 
     @Test

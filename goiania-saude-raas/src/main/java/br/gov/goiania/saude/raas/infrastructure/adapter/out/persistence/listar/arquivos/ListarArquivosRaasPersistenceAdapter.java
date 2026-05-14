@@ -6,8 +6,9 @@ import br.gov.goiania.saude.raas.domain.model.ListarArquivosRaasFiltro;
 import br.gov.goiania.saude.raas.infrastructure.mapper.ListarArquivosRaasMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -17,16 +18,15 @@ public class ListarArquivosRaasPersistenceAdapter implements ListarArquivosRaasP
     private final ListarArquivosRaasMapper mapper;
 
     @Override
-    public List<ListarArquivosRaas> execute(final ListarArquivosRaasFiltro filtro) {
+    public Page<ListarArquivosRaas> execute(final ListarArquivosRaasFiltro filtro, Pageable pageable) {
         return repository
                 .buscarProcessosPorCompetenciaEmpresaEStatus(
                         filtro.mes(),
                         filtro.ano(),
                         filtro.codigoEmpresa(),
-                        filtro.status()
+                        filtro.status(),
+                        pageable
                 )
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
+                .map(mapper::toDomain);
     }
 }

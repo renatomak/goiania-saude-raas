@@ -7,10 +7,10 @@ public final class ListarArquivosRaasRequestMock {
     private ListarArquivosRaasRequestMock() { }
 
     public static ListarArquivosRaasRequest valido() {
-        return new ListarArquivosRaasRequest(5, 2026, "123", 3);
+        return new ListarArquivosRaasRequest(5, 2026, "123", 3, 0, 10);
     }
 
     public static ListarArquivosRaasRequest notFound() {
-        return new ListarArquivosRaasRequest(5, 2026, "999", 3);
+        return new ListarArquivosRaasRequest(5, 2026, "999", 3, 0, 10);
     }
 }
