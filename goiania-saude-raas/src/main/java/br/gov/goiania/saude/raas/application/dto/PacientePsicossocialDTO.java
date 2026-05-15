@@ -31,5 +31,15 @@ public class PacientePsicossocialDTO {
     private String coberturaEsf;
     private String cnesEsf;
     private String destinoPaciente;
+    private String numeroProntuario;
+    private String origemPaciente;
+    private String situacaoRua;
+    private String usuarioDrogas;
+    private String tipoDrogaAlcool;
+    private String tipoDrogaCrack;
+    private String tipoDrogaOutros;
+    private String descricaoBairro;
+    private String tipoLogradouro;
+    private String emailPaciente;
     private List<AcaoPsicossocialDTO> acoes;
 }

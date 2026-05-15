@@ -20,7 +20,7 @@ public class RaasPsicossocialService {
 
     public String gerarArquivo(final RaasRemessaPsicossocialDTO remessa) {
         final StringBuilder sb = new StringBuilder();
-        sb.append(gerarLinha01(remessa.getHeader(), remessa.getPacientes().size()));
+        sb.append(gerarLinha01(remessa.getHeader()));
         sb.append("\r\n");
         for (final PacientePsicossocialDTO paciente : remessa.getPacientes()) {
             sb.append(gerarLinha15(paciente));
@@ -34,13 +34,13 @@ public class RaasPsicossocialService {
         return sb.toString();
     }
 
-    private String gerarLinha01(final HeaderDTO header, final int quantidadeFolhas) {
+    private String gerarLinha01(final HeaderDTO header) {
         final StringBuilder sb = new StringBuilder();
         sb.append("01");
         sb.append("#RAS#");
         sb.append(leftPad(header.getCompetencia(), 6));
-        sb.append(leftPad(String.valueOf(quantidadeFolhas), 6));
-        sb.append("1111");
+        sb.append(leftPad(String.valueOf(header.getQuantidadeFolhas()), 6));
+        sb.append(String.valueOf(header.getCampoControle()));
         sb.append(rightPad(header.getNomeResponsavel(), 30));
         sb.append(rightPad(header.getSiglaResponsavel(), 6));
         sb.append(leftPad(numericOnly(header.getCnpjResponsavel()), 14));
@@ -64,7 +64,7 @@ public class RaasPsicossocialService {
         sb.append(rightPad(paciente.getDataInicio(), 8));
         sb.append(rightPad(paciente.getDataFim() != null ? paciente.getDataFim() : "", 8));
         sb.append(rightPad(paciente.getNomePaciente(), 30));
-        sb.append(FILLER_10);
+        sb.append(rightPad(paciente.getNumeroProntuario(), 10));
         sb.append(rightPad(paciente.getNomeMae(), 30));
         sb.append(rightPad(paciente.getLogradouro(), 30));
         sb.append(rightPad(paciente.getNumeroEndereco(), 5));
@@ -92,20 +92,22 @@ public class RaasPsicossocialService {
         sb.append(FILLER_4);
         sb.append(FILLER_4);
         sb.append(FILLER_2);
-        sb.append("01");
+        sb.append(paciente.getOrigemPaciente());
         sb.append(paciente.getCoberturaEsf());
         sb.append(rightPad(paciente.getCnesEsf() != null ? paciente.getCnesEsf() : "", 7));
         sb.append(leftPad(String.valueOf(paciente.getAcoes().size()), 5));
         sb.append(paciente.getDestinoPaciente());
-        sb.append("RAS");
-        sb.append("N");
-        sb.append("N");
-        sb.append(FILLER_3);
+        sb.append("EXT");
+        sb.append(paciente.getSituacaoRua());
+        sb.append(paciente.getUsuarioDrogas());
+        sb.append(rightPad(paciente.getTipoDrogaAlcool(), 1));
+        sb.append(rightPad(paciente.getTipoDrogaCrack(), 1));
+        sb.append(rightPad(paciente.getTipoDrogaOutros(), 1));
         sb.append(FILLER_13);
-        sb.append(FILLER_30);
-        sb.append(FILLER_3);
-        sb.append(FILLER_40);
-        sb.append(rightPad(paciente.getCpfPaciente() != null ? paciente.getCpfPaciente() : "", 11));
+        sb.append(rightPad(paciente.getDescricaoBairro(), 30));
+        sb.append(rightPad(paciente.getTipoLogradouro(), 3));
+        sb.append(rightPad(paciente.getEmailPaciente(), 40));
+        sb.append(leftPad(paciente.getCpfPaciente() != null ? paciente.getCpfPaciente() : "", 11));
         sb.append(FILLER_4);
         return sb.toString();
     }
@@ -123,12 +125,12 @@ public class RaasPsicossocialService {
         sb.append(leftPad(acao.getCbo(), 6));
         sb.append(rightPad(acao.getCnsProfissional(), 15));
         sb.append(rightPad(acao.getDataExecucao(), 8));
-        sb.append("113");
+        sb.append(rightPad(acao.getServico(), 3));
         sb.append(rightPad(acao.getClassificacao() != null ? acao.getClassificacao() : "001", 3));
         sb.append(leftPad(acao.getQuantidade().toString(), 6));
-        sb.append("RAS");
-        sb.append("C");
-        sb.append(rightPad(paciente.getCpfPaciente() != null ? paciente.getCpfPaciente() : "", 11));
+        sb.append("EXT");
+        sb.append(acao.getLocalRealizacao());
+        sb.append(leftPad(paciente.getCpfPaciente() != null ? paciente.getCpfPaciente() : "", 11));
         sb.append(FILLER_4);
         return sb.toString();
     }

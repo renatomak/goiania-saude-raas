@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class HeaderDTO {
     private String competencia;
+    private Long quantidadeFolhas;
+    private Long campoControle;
     private String nomeResponsavel;
     private String siglaResponsavel;
     private String cnpjResponsavel;

@@ -32,6 +32,8 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         final String competenciaDate = competencia.substring(0, 4)
                 + "-" + competencia.substring(4) + "-01";
 
+        final RaasHeaderProjection headerProj =
+                repository.buscarHeaderPorCompetencia(competenciaDate);
         final List<RaasPsiPacienteProjection> pacientesProj =
                 repository.buscarPacientesPorCompetencia(competenciaDate);
         final List<RaasPsiItemProjection> itensProj =
@@ -49,21 +51,29 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         }
 
         final RaasRemessaPsicossocialDTO remessa = new RaasRemessaPsicossocialDTO();
-        remessa.setHeader(criarHeader(competencia));
+        remessa.setHeader(criarHeader(competencia, headerProj));
         remessa.setPacientes(pacientes);
         return remessa;
     }
 
-    private HeaderDTO criarHeader(final String competencia) {
+    private HeaderDTO criarHeader(final String competencia,
+                                  final RaasHeaderProjection headerProj) {
         final HeaderDTO header = new HeaderDTO();
         header.setCompetencia(competencia);
-        header.setNomeResponsavel("SECRETARIA MUNICIPAL DE SAUDE");
-        header.setSiglaResponsavel("SMSGO");
-        header.setCnpjResponsavel("00000000000000");
-        header.setNomeDestino("MINISTERIO DA SAUDE");
-        header.setDataGeracao(LocalDate.now().format(FORMATO_DATA));
-        header.setVersaoSistema("01.00");
-        header.setVersaoBdsia(competencia + "a");
+        if (headerProj != null) {
+            header.setQuantidadeFolhas(headerProj.getQuantidadeFolhas());
+            header.setCampoControle(headerProj.getCampoControle());
+            header.setNomeResponsavel(headerProj.getNmOrgaoOrigem());
+            header.setSiglaResponsavel(headerProj.getSiglaOrgaoOrigem());
+            header.setCnpjResponsavel(
+                    headerProj.getCgcPrestador() != null
+                            ? String.valueOf(headerProj.getCgcPrestador()) : "");
+            header.setNomeDestino(headerProj.getNmOrgaoDestino());
+            header.setDataGeracao(headerProj.getDtGeracao() != null
+                    ? headerProj.getDtGeracao().format(FORMATO_DATA) : "");
+            header.setVersaoSistema(headerProj.getVersao());
+            header.setVersaoBdsia(headerProj.getVersaoBdsia());
+        }
         return header;
     }
 
@@ -76,6 +86,22 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
     }
 
     private PacientePsicossocialDTO mapearDadosBasicos(
+            final RaasPsiPacienteProjection p) {
+        final PacientePsicossocialDTO dto = mapearDadosPessoais(p);
+        dto.setNumeroProntuario(formatarProntuario(p.getNumeroProntuario()));
+        dto.setOrigemPaciente(formatarOrigem(p.getOrigemPaciente()));
+        dto.setSituacaoRua(p.getSituacaoRua() != null ? p.getSituacaoRua() : "N");
+        dto.setUsuarioDrogas(p.getUsuarioDrogas() != null ? p.getUsuarioDrogas() : "N");
+        dto.setTipoDrogaAlcool(p.getTipoDrogaAlcool() != null ? p.getTipoDrogaAlcool() : " ");
+        dto.setTipoDrogaCrack(p.getTipoDrogaCrack() != null ? p.getTipoDrogaCrack() : " ");
+        dto.setTipoDrogaOutros(p.getTipoDrogaOutros() != null ? p.getTipoDrogaOutros() : " ");
+        dto.setDescricaoBairro(p.getDescricaoBairro());
+        dto.setTipoLogradouro(formatarTipoLogradouro(p.getTipoLogradouro()));
+        dto.setEmailPaciente(p.getEmailPaciente());
+        return dto;
+    }
+
+    private PacientePsicossocialDTO mapearDadosPessoais(
             final RaasPsiPacienteProjection p) {
         final PacientePsicossocialDTO dto = new PacientePsicossocialDTO();
         dto.setUf(formatarUf(p.getUnidadeFederacao()));
@@ -119,6 +145,9 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
             dto.setClassificacao(formatarClassificacao(i.getClassificacao()));
             dto.setQuantidade(i.getQuantidadeRealizada() != null
                     ? i.getQuantidadeRealizada() : 1);
+            dto.setServico(formatarServico(i.getServico()));
+            dto.setLocalRealizacao(i.getLocalRealizacao() != null
+                    ? i.getLocalRealizacao() : "C");
             acoes.add(dto);
         }
         return acoes;
@@ -172,5 +201,21 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
     private String formatarClassificacao(final Integer classificacao) {
         return classificacao != null
                 ? String.format("%03d", classificacao) : "001";
+    }
+
+    private String formatarServico(final Integer servico) {
+        return servico != null ? String.format("%03d", servico) : "113";
+    }
+
+    private String formatarProntuario(final Integer prontuario) {
+        return prontuario != null ? String.format("%010d", prontuario) : "";
+    }
+
+    private String formatarOrigem(final Integer origem) {
+        return origem != null ? String.format("%02d", origem) : "01";
+    }
+
+    private String formatarTipoLogradouro(final Integer tipo) {
+        return tipo != null ? String.format("%03d", tipo) : "";
     }
 }

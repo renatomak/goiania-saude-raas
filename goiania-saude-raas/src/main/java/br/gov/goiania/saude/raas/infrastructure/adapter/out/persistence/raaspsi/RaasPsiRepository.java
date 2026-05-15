@@ -92,4 +92,23 @@ public interface RaasPsiRepository extends JpaRepository<RaasPsiEntity, Long> {
     List<RaasPsiItemProjection> buscarItensPorCompetencia(
             @Param("competencia") String competencia
     );
+    @Query(value = """
+            SELECT
+                r.quantidade_folhas AS quantidadeFolhas,
+                r.campo_controle AS campoControle,
+                r.nm_orgao_origem AS nmOrgaoOrigem,
+                r.sigla_orgao_origem AS siglaOrgaoOrigem,
+                r.cgc_prestador AS cgcPrestador,
+                r.nm_orgao_destino AS nmOrgaoDestino,
+                r.indicador_orgao_destino AS indicadorOrgaoDestino,
+                r.dt_geracao AS dtGeracao,
+                r.versao AS versao,
+                r.versao_bdsia AS versaoBdsia
+            FROM raas r
+            WHERE r.competencia = CAST(:competencia AS date)
+            LIMIT 1
+            """, nativeQuery = true)
+    RaasHeaderProjection buscarHeaderPorCompetencia(
+            @Param("competencia") String competencia
+    );
 }
