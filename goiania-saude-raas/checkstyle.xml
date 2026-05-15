@@ -11,6 +11,11 @@
         <property name="files" value=".*Application\.java"/>
     </module>
 
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MethodCount"/>
+        <property name="files" value=".*Projection\.java"/>
+    </module>
+
     <module name="TreeWalker">
 
         <module name="CommentsIndentation"/>
