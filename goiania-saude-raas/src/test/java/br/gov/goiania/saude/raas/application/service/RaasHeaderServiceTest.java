@@ -4,6 +4,7 @@ import br.gov.goiania.saude.raas.application.dto.HeaderDTO;
 import br.gov.goiania.saude.raas.mock.HeaderDTOMock;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -18,6 +19,7 @@ class RaasHeaderServiceTest {
     }
 
     @Test
+    @DisplayName("[Regra 1-15] Validação geral do header completo (todos os campos)")
     void gerarHeaderLinha01DeveRetornarHeaderCompletoQuandoDadosValidos() {
         final HeaderDTO header = HeaderDTOMock.valido();
         final String linha = service.gerarHeaderLinha01(header, 1234L);
@@ -35,6 +37,7 @@ class RaasHeaderServiceTest {
             "'SMS', '251415', '12345678000195', 'SMS                           '",
             "'ORGÃO', '251415', '12345678000195', 'ORGÃO                         '"
     })
+    @DisplayName("[Regra 6] Nome do órgão responsável (cbc-rsp) com padding à direita")
     void gerarHeaderLinha01DeveRetornarNomeResponsavelComPaddingQuandoNomeMenorQue30(
             final String nome, final String sigla, final String cnpj,
             final String expectedNome) {
@@ -52,6 +55,7 @@ class RaasHeaderServiceTest {
             "'FATURAMENTO', '251415', '123', '00000000000123'",
             "'FATURAMENTO', '251415', '', '00000000000000'"
     })
+    @DisplayName("[Regra 8] CNPJ do órgão responsável (cbc-cgccpf) com zeros à esquerda")
     void gerarHeaderLinha01DeveRetornarCnpjComZerosQuandoCnpjMenorQue14(
             final String nome, final String sigla, final String cnpj,
             final String expectedCnpj) {
@@ -68,6 +72,7 @@ class RaasHeaderServiceTest {
             "0, '000000'",
             "99999, '099999'"
     })
+    @DisplayName("[Regra 4] Quantidade de folhas (cbc-lin) com padding de zeros à esquerda")
     void gerarHeaderLinha01DeveRetornarQuantidadeFolhasComPaddingQuandoZeroOuGrande(
             final long qtdFolhas, final String expectedQtd) {
         final HeaderDTO header = HeaderDTOMock.valido();
@@ -77,6 +82,7 @@ class RaasHeaderServiceTest {
     }
 
     @Test
+    @DisplayName("[Regra 6,7,8] Header com campos em branco ou zeros quando nulos/vazios (cbc-rsp, cbc-sgl, cbc-cgccpf)")
     void gerarHeaderLinha01DeveRetornarHeaderComCamposEmBrancoOuZerosQuandoCamposNulosOuVazios() {
         final HeaderDTO header = HeaderDTOMock.vazio();
         final String linha = service.gerarHeaderLinha01(header, 1111L);
@@ -88,6 +94,7 @@ class RaasHeaderServiceTest {
     }
 
     @Test
+    @DisplayName("[Regra 1-15] Header com tamanho exato (159 caracteres)")
     void gerarHeaderLinha01DeveRetornarStringComTamanhoExatoQuandoQualquerEntrada() {
         final HeaderDTO header = HeaderDTOMock.minimo();
         final String linha = service.gerarHeaderLinha01(header, 1111L);
@@ -95,6 +102,7 @@ class RaasHeaderServiceTest {
     }
 
     @Test
+    @DisplayName("[Regra 1-4] Header com campos fixos e tamanho correto quando campos nulos")
     void gerarHeaderLinha01DeveRetornarTamanho159ComCamposNulos() {
         final HeaderDTO header = HeaderDTOMock.nulo();
         final String linha = service.gerarHeaderLinha01(header, 1111L);

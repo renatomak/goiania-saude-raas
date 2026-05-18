@@ -92,20 +92,20 @@ Para dúvidas ou sugestões, abra uma issue ou entre em contato com a equipe de 
 
 ## Layout da Linha 01 (Header RAAS)
 
-| Posição   | Tamanho | Nome do Campo (Layout) | Descrição                                 | Tipo / Preenchimento                | Exemplo                                 |
-|-----------|---------|------------------------|--------------------------------------------|--------------------------------------|------------------------------------------|
-| 001-002   | 002     | cbc-codlinha           | Código da linha                            | Fixo                                 | 01                                       |
-| 003-007   | 005     | cbc-hdr                | Identificador do arquivo                   | Fixo                                 | #RAS#                                    |
-| 008-013   | 006     | cbc-mvm                | Competência (Ano + Mês)                    | AAAAMM                               | 202510                                   |
-| 014-019   | 006     | cbc-lin                | Quantidade de folhas (nº de registros 15)  | Numérico, zeros à esquerda           | 001839                                   |
-| 020-023   | 004     | cbc-smt-vrf            | Campo de Controle (Checksum)               | Numérico (1111 a 2221)               | 1305                                     |
-| 024-053   | 030     | cbc-rsp                | Nome do órgão responsável (Origem)         | Texto, espaços à direita             | FATURAMENTO SMS GCPAH                    |
-| 054-059   | 006     | cbc-sgl                | Sigla do órgão responsável                 | Texto, espaços à direita             | 251415                                   |
-| 060-073   | 014     | cbc-cgccpf             | CNPJ do órgão responsável                  | Numérico, zeros à esquerda           | 25141524000123                           |
-| 074-113   | 040     | cbc-dst                | Nome do órgão de destino                   | Texto, espaços à direita             | SECRETARIA MUN DE SAUDE DE GOIANIA       |
-| 114       | 001     | cbc-dst-in             | Indicador do destino                       | M (Municipal) ou E (Estadual)        | M                                        |
-| 115-122   | 008     | cbc-dtger              | Data de geração do arquivo                 | AAAAMMDD                             | 20251031                                 |
-| 123-127   | 005     | cbc_versao             | Versão do sistema                          | XX.XX                                | 02.21                                    |
-| 128-137   | 010     | Filler                 | Campo reservado                            | Zeros ou espaços                     | 0000000000                               |
-| 138-144   | 007     | cbc_bdversao           | Versão do BDSIA utilizado                  | Ex: 202510a                          | 202510a                                  |
-| 145-159   | 015     | cbc-fim                | Final da linha                             | Espaços + \r\n                      |                                          |
+| Posição   | Tamanho | Nome do Campo (Layout) | Descrição                                 | Tipo / Preenchimento            | Exemplo                             |
+|-----------|---------|------------------------|--------------------------------------------|---------------------------------|-------------------------------------|
+| 001-002   | 002     | cbc-codlinha           | Código da linha                            | Fixo                            | 01                                  |
+| 003-007   | 005     | cbc-hdr                | Identificador do arquivo                   | Fixo                            | #RAS#                               |
+| 008-013   | 006     | cbc-mvm                | Competência (Ano + Mês)                    | AAAAMM                          | 202510                              |
+| 014-019   | 006     | cbc-lin                | Quantidade de folhas (nº de registros 15)  | Numérico, zeros à esquerda      | 001839                              |
+| 020-023   | 004     | cbc-smt-vrf            | Campo de Controle (Checksum)               | Numérico (1111 a 2221)          | 1305                                |
+| 024-053   | 030     | cbc-rsp                | Nome do órgão responsável (Origem)         | Texto, espaços à direita        | FATURAMENTO SMS GCPAH               |
+| 054-059   | 006     | cbc-sgl                | Sigla do órgão responsável                 | Texto, espaços à direita        | 251415                              |
+| 060-073   | 014     | cbc-cgccpf             | CNPJ do órgão responsável                  | Numérico, zeros à esquerda      | 25141524000123                      |
+| 074-113   | 040     | cbc-dst                | Nome do órgão de destino                   | Texto, espaços à direita        | SECRETARIA MUN DE SAUDE DE GOIANIA  |
+| 114       | 001     | cbc-dst-in             | Indicador do destino                       | M (Municipal) ou E (Estadual)   | M                                   |
+| 115-122   | 008     | cbc-dtger              | Data de geração do arquivo                 | AAAAMMDD                        | 20251031                            |
+| 123-127   | 005     | cbc_versao             | Versão do sistema                          | XX.XX                           | 02.21                               |
+| 128-137   | 010     | Filler                 | Campo reservado                            | Zeros ou espaços                | 0000000000                          |
+| 138-144   | 007     | cbc_bdversao           | Versão do BDSIA utilizado                  | Ex: 202510a                     | 202510a                             |
+| 145-159   | 015     | cbc-fim                | Final da linha                             | Espaços + \r\n                  |                                     |
