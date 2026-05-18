@@ -35,5 +35,43 @@ public final class HeaderDTOMock {
         dto.setVersaoBdsia("202406a");
         return dto;
     }
+
+    public static HeaderDTO vazio() {
+        HeaderDTO dto = new HeaderDTO();
+        dto.setCompetencia("202405");
+        dto.setQuantidadeFolhas(0L);
+        dto.setDataGeracao("20240518");
+        dto.setVersaoSistema("02.21");
+        dto.setVersaoBdsia("202405a");
+        return dto;
+    }
+
+    public static HeaderDTO minimo() {
+        HeaderDTO dto = new HeaderDTO();
+        dto.setCompetencia("1");
+        dto.setQuantidadeFolhas(1L);
+        dto.setNomeResponsavel("A");
+        dto.setSiglaResponsavel("B");
+        dto.setCnpjResponsavel("1");
+        dto.setNomeDestino("C");
+        dto.setDataGeracao("20240518");
+        dto.setVersaoSistema("1.0.0");
+        dto.setVersaoBdsia("2.0.0");
+        return dto;
+    }
+
+    public static HeaderDTO nulo() {
+        HeaderDTO dto = new HeaderDTO();
+        dto.setCompetencia(null);
+        dto.setQuantidadeFolhas(null);
+        dto.setNomeResponsavel(null);
+        dto.setSiglaResponsavel(null);
+        dto.setCnpjResponsavel(null);
+        dto.setNomeDestino(null);
+        dto.setDataGeracao(null);
+        dto.setVersaoSistema(null);
+        dto.setVersaoBdsia(null);
+        return dto;
+    }
 }
 
