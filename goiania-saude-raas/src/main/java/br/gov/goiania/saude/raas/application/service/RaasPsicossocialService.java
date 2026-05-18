@@ -54,7 +54,7 @@ public class RaasPsicossocialService {
         }
     }
 
-    private String gerarLinha01(final HeaderDTO header, final long campoControle) {
+    String gerarLinha01(final HeaderDTO header, final long campoControle) {
         final StringBuilder sb = new StringBuilder();
         sb.append("01");                                           // 001-002
         sb.append("#RAS#");                                        // 003-007
