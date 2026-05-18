@@ -18,12 +18,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort {
 
-    private static final DateTimeFormatter FORMATO_COMPETENCIA =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FORMATO_DATA =
             DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter FORMATO_COMPETENCIA_HEADER =
             DateTimeFormatter.ofPattern("yyyyMM");
+
+    private static final String NOME_RESPONSAVEL = "FATURAMENTO SMS";
+    private static final String SIGLA_RESPONSAVEL = "GCPAH";
+    private static final String CNPJ_RESPONSAVEL = "25141524000123";
+    private static final String NOME_DESTINO = "SECRETARIA MUN DE SAUDE DE GOIANIA";
 
     private final RaasPsiRepository repository;
 
@@ -60,19 +63,17 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
                                   final RaasHeaderProjection headerProj) {
         final HeaderDTO header = new HeaderDTO();
         header.setCompetencia(competencia);
+        header.setNomeResponsavel(NOME_RESPONSAVEL);
+        header.setSiglaResponsavel(SIGLA_RESPONSAVEL);
+        header.setCnpjResponsavel(CNPJ_RESPONSAVEL);
+        header.setNomeDestino(NOME_DESTINO);
         if (headerProj != null) {
             header.setQuantidadeFolhas(headerProj.getQuantidadeFolhas());
             header.setCampoControle(headerProj.getCampoControle());
-            header.setNomeResponsavel(headerProj.getNmOrgaoOrigem());
-            header.setSiglaResponsavel(headerProj.getSiglaOrgaoOrigem());
-            header.setCnpjResponsavel(
-                    headerProj.getCgcPrestador() != null
-                            ? String.valueOf(headerProj.getCgcPrestador()) : "");
-            header.setNomeDestino(headerProj.getNmOrgaoDestino());
             header.setDataGeracao(headerProj.getDtGeracao() != null
                     ? headerProj.getDtGeracao().format(FORMATO_DATA) : "");
             header.setVersaoSistema(headerProj.getVersao());
-            header.setVersaoBdsia(headerProj.getVersaoBdsia());
+            header.setVersaoBdsia(competencia + "a");
         }
         return header;
     }
