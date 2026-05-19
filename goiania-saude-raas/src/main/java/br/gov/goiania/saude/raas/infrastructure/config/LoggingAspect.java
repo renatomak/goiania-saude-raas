@@ -26,17 +26,41 @@ public class LoggingAspect {
         }
 
         long inicio = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
-        long duracao = System.currentTimeMillis() - inicio;
-
-        if (result instanceof Collection<?> collection) {
-            if (log.isInfoEnabled()) {
-                log.info("[{}#{}] concluido em {}ms | resultado: {} registros", className, methodName, duracao, collection.size());
+        try {
+            Object result = joinPoint.proceed();
+            long duracao = System.currentTimeMillis() - inicio;
+            if (result instanceof Collection<?> collection) {
+                if (log.isInfoEnabled()) {
+                    log.info("[{}#{}] concluido em {}ms | resultado: {} registros", className, methodName, duracao, collection.size());
+                }
+            } else {
+                if (log.isInfoEnabled()) {
+                    log.info("[{}#{}] concluido em {}ms", className, methodName, duracao);
+                }
             }
-        } else if (log.isInfoEnabled()) {
-            log.info("[{}#{}] concluido em {}ms", className, methodName, duracao);
+            return result;
+        } catch (Exception ex) {
+            long duracao = System.currentTimeMillis() - inicio;
+            if (log.isErrorEnabled()) {
+                log.error("[{}#{}] ERRO em {}ms\nParametros: {}", className, methodName, duracao, getArgsString(joinPoint), ex);
+            }
+            throw ex;
         }
+    }
 
-        return result;
+    private String getArgsString(ProceedingJoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        if (args == null || args.length == 0) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < args.length; i++) {
+            sb.append(args[i]);
+            if (i < args.length - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

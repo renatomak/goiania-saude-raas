@@ -38,7 +38,18 @@ public class LoggingInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         Long startTime = (Long) request.getAttribute(START_TIME_KEY);
         long duration = startTime != null ? System.currentTimeMillis() - startTime : -1;
-        if (log.isInfoEnabled()) {
+        if (ex != null) {
+            if (log.isErrorEnabled()) {
+                log.error(
+                    "Erro na requisição {} {} | Status: {} | Duração: {}ms",
+                    request.getMethod(),
+                    request.getRequestURI(),
+                    response.getStatus(),
+                    duration,
+                    ex
+                );
+            }
+        } else if (log.isInfoEnabled()) {
             log.info("Finalizado em {}ms | Status: {}", duration, response.getStatus());
         }
         MDC.remove(CORRELATION_ID_KEY);
