@@ -7,10 +7,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class RaasAcaoService {
 
+    private static final int TAMANHO_LINHA = 110;
+
     private static final String CODIGO_LINHA = "16";
     private static final String ORIGEM_INFORMACOES = "EXT";
     private static final String FILLER_4 = "    ";
-    private static final int TAMANHO_LINHA = 110;
 
     private static final int TAM_UF = 2;
     private static final int TAM_COMPETENCIA = 6;
@@ -28,12 +29,13 @@ public class RaasAcaoService {
 
     public String gerarLinha16(final PacientePsicossocialDTO paciente,
                                final AcaoPsicossocialDTO acao) {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder(TAMANHO_LINHA);
         sb.append(CODIGO_LINHA);
         sb.append(RaasPaddingUtil.leftPad(paciente.getUf(), TAM_UF));
         sb.append(RaasPaddingUtil.leftPad(paciente.getCompetencia(), TAM_COMPETENCIA));
         sb.append(RaasPaddingUtil.leftPad(paciente.getCnes(), TAM_CNES));
-        sb.append(formatarCns(paciente));
+        sb.append(RaasGenerationDomainService.resolverCns(
+                paciente.getCnsPaciente(), paciente.getCpfPaciente(), TAM_CNS));
         sb.append(RaasPaddingUtil.rightPad(paciente.getDataInicio(), TAM_DATA));
         sb.append(RaasPaddingUtil.leftPad(acao.getProcedimento(), TAM_PROCEDIMENTO));
         sb.append(RaasPaddingUtil.leftPad(acao.getCbo(), TAM_CBO));
@@ -44,31 +46,13 @@ public class RaasAcaoService {
         sb.append(RaasPaddingUtil.leftPad(acao.getQuantidade().toString(), TAM_QUANTIDADE));
         sb.append(ORIGEM_INFORMACOES);
         sb.append(RaasPaddingUtil.rightPad(acao.getLocalRealizacao(), TAM_LOCAL));
-        sb.append(formatarCpf(paciente));
+        sb.append(RaasGenerationDomainService.resolverCpf(
+                paciente.getCpfPaciente(), paciente.getCnsPaciente(), TAM_CPF));
         sb.append(FILLER_4);
 
         final String linha = sb.toString();
-        if (linha.length() != TAMANHO_LINHA) {
-            throw new IllegalStateException(
-                    "Linha 16 com tamanho " + linha.length()
-                            + ", esperado " + TAMANHO_LINHA);
-        }
+        RaasGenerationDomainService.validarTamanhoLinha(
+                linha, TAMANHO_LINHA, "16");
         return linha;
-    }
-
-    private String formatarCns(final PacientePsicossocialDTO paciente) {
-        if (paciente.getCnsPaciente() != null
-                && !paciente.getCnsPaciente().isBlank()) {
-            return RaasPaddingUtil.rightPad(paciente.getCnsPaciente(), TAM_CNS);
-        }
-        return RaasPaddingUtil.leftPad("", TAM_CNS);
-    }
-
-    private String formatarCpf(final PacientePsicossocialDTO paciente) {
-        if (paciente.getCpfPaciente() != null
-                && !paciente.getCpfPaciente().isBlank()) {
-            return RaasPaddingUtil.leftPad(paciente.getCpfPaciente(), TAM_CPF);
-        }
-        return RaasPaddingUtil.leftPad("", TAM_CPF);
     }
 }

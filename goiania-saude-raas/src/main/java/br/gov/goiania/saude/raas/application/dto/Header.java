@@ -3,7 +3,7 @@ package br.gov.goiania.saude.raas.application.dto;
 import lombok.Data;
 
 @Data
-public class HeaderDTO {
+public class Header {
     private String competencia;
     private Long quantidadeFolhas;
     private Long campoControle;

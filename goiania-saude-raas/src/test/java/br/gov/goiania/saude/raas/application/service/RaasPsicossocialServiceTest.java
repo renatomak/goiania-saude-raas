@@ -16,8 +16,7 @@ class RaasPsicossocialServiceTest {
         service = new RaasPsicossocialService(
                 new RaasHeaderService(),
                 new RaasPacienteService(),
-                new RaasAcaoService()
-        );
+                new RaasAcaoService());
     }
 
     @Test

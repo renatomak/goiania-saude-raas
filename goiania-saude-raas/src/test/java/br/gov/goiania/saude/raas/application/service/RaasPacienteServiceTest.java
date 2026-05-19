@@ -89,11 +89,24 @@ class RaasPacienteServiceTest {
     }
 
     @Test
-    @DisplayName("[Linha 15 - Campo 35] Total de ações deve refletir quantidade de itens na lista")
-    void gerarLinha15DeveCalcularTotalAcoes() {
+    @DisplayName("[Linha 15 - Campo 09] Prontuário deve ser alinhado à esquerda com espaços à direita")
+    void gerarLinha15DeveAlinharProntuarioAEsquerdaComEspacos() {
         final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();
+        paciente.setNumeroProntuario("12345");
         final String linha = service.gerarLinha15(paciente);
-        Assertions.assertThat(linha.substring(290, 295)).isEqualTo("00000");
+        Assertions.assertThat(linha.substring(78, 88)).isEqualTo("12345     ");
+    }
+
+    @Test
+    @DisplayName("[Linha 15 - Campo 09] Prontuário não deve conter zeros à esquerda")
+    void gerarLinha15DeveNaoTerZerosAEsquerdaNoProntuario() {
+        final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();
+        paciente.setNumeroProntuario("42");
+        final String linha = service.gerarLinha15(paciente);
+        final String prontuario = linha.substring(78, 88);
+        Assertions.assertThat(prontuario).startsWith("42");
+        Assertions.assertThat(prontuario).doesNotStartWith("0");
+        Assertions.assertThat(prontuario).isEqualTo("42        ");
     }
 
     @Test

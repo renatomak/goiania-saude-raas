@@ -1,13 +1,13 @@
 package br.gov.goiania.saude.raas.mock;
 
-import br.gov.goiania.saude.raas.application.dto.HeaderDTO;
+import br.gov.goiania.saude.raas.application.dto.Header;
 
 public final class HeaderDTOMock {
 
     private HeaderDTOMock() { }
 
-    public static HeaderDTO valido() {
-        HeaderDTO dto = new HeaderDTO();
+    public static Header valido() {
+        Header dto = new Header();
         dto.setCompetencia("202405");
         dto.setQuantidadeFolhas(12L);
         dto.setCampoControle(1234L);
@@ -21,8 +21,8 @@ public final class HeaderDTOMock {
         return dto;
     }
 
-    public static HeaderDTO exemplo() {
-        HeaderDTO dto = new HeaderDTO();
+    public static Header exemplo() {
+        Header dto = new Header();
         dto.setCompetencia("202406");
         dto.setQuantidadeFolhas(34L);
         dto.setCampoControle(5678L);
@@ -36,8 +36,8 @@ public final class HeaderDTOMock {
         return dto;
     }
 
-    public static HeaderDTO vazio() {
-        HeaderDTO dto = new HeaderDTO();
+    public static Header vazio() {
+        Header dto = new Header();
         dto.setCompetencia("202405");
         dto.setQuantidadeFolhas(0L);
         dto.setDataGeracao("20240518");
@@ -46,8 +46,8 @@ public final class HeaderDTOMock {
         return dto;
     }
 
-    public static HeaderDTO minimo() {
-        HeaderDTO dto = new HeaderDTO();
+    public static Header minimo() {
+        Header dto = new Header();
         dto.setCompetencia("1");
         dto.setQuantidadeFolhas(1L);
         dto.setNomeResponsavel("A");
@@ -60,8 +60,8 @@ public final class HeaderDTOMock {
         return dto;
     }
 
-    public static HeaderDTO nulo() {
-        HeaderDTO dto = new HeaderDTO();
+    public static Header nulo() {
+        Header dto = new Header();
         dto.setCompetencia(null);
         dto.setQuantidadeFolhas(null);
         dto.setNomeResponsavel(null);

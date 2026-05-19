@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class RaasRemessaPsicossocialDTO {
-    private HeaderDTO header;
+    private Header header;
     private List<PacientePsicossocialDTO> pacientes;
 }

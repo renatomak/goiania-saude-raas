@@ -31,4 +31,8 @@ public final class RaasPaddingUtil {
         }
         return value.replaceAll("\\D", "");
     }
+
+    public static String apenasDigitos(final String value) {
+        return numericOnly(value);
+    }
 }

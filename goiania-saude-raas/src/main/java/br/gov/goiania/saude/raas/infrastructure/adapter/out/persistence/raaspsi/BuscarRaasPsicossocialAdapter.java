@@ -1,11 +1,11 @@
 package br.gov.goiania.saude.raas.infrastructure.adapter.out.persistence.raaspsi;
 
 import br.gov.goiania.saude.raas.application.dto.AcaoPsicossocialDTO;
-import br.gov.goiania.saude.raas.application.dto.HeaderDTO;
+import br.gov.goiania.saude.raas.application.dto.Header;
 import br.gov.goiania.saude.raas.application.dto.PacientePsicossocialDTO;
 import br.gov.goiania.saude.raas.application.dto.RaasRemessaPsicossocialDTO;
 import br.gov.goiania.saude.raas.application.ports.out.BuscarRaasPsicossocialPort;
-import java.time.LocalDate;
+import br.gov.goiania.saude.raas.application.service.RaasFormatacaoUtil;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +20,6 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
 
     private static final DateTimeFormatter FORMATO_DATA =
             DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static final DateTimeFormatter FORMATO_COMPETENCIA_HEADER =
-            DateTimeFormatter.ofPattern("yyyyMM");
 
     private static final String NOME_RESPONSAVEL = "FATURAMENTO SMS";
     private static final String SIGLA_RESPONSAVEL = "GCPAH";
@@ -59,9 +57,9 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         return remessa;
     }
 
-    private HeaderDTO criarHeader(final String competencia,
-                                  final RaasHeaderProjection headerProj) {
-        final HeaderDTO header = new HeaderDTO();
+    private Header criarHeader(final String competencia,
+                               final RaasHeaderProjection headerProj) {
+        final Header header = new Header();
         header.setCompetencia(competencia);
         header.setNomeResponsavel(NOME_RESPONSAVEL);
         header.setSiglaResponsavel(SIGLA_RESPONSAVEL);
@@ -81,56 +79,51 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
     private PacientePsicossocialDTO mapearPaciente(
             final RaasPsiPacienteProjection p,
             final List<RaasPsiItemProjection> itens) {
-        final PacientePsicossocialDTO dto = mapearDadosBasicos(p);
-        dto.setAcoes(mapearAcoes(itens));
-        return dto;
-    }
-
-    private PacientePsicossocialDTO mapearDadosBasicos(
-            final RaasPsiPacienteProjection p) {
         final PacientePsicossocialDTO dto = mapearDadosPessoais(p);
-        dto.setNumeroProntuario(formatarProntuario(p.getNumeroProntuario()));
-        dto.setOrigemPaciente(formatarOrigem(p.getOrigemPaciente()));
-        dto.setSituacaoRua(p.getSituacaoRua() != null ? p.getSituacaoRua() : "N");
-        dto.setUsuarioDrogas(p.getUsuarioDrogas() != null ? p.getUsuarioDrogas() : "N");
-        dto.setTipoDrogaAlcool(p.getTipoDrogaAlcool() != null ? p.getTipoDrogaAlcool() : " ");
-        dto.setTipoDrogaCrack(p.getTipoDrogaCrack() != null ? p.getTipoDrogaCrack() : " ");
-        dto.setTipoDrogaOutros(p.getTipoDrogaOutros() != null ? p.getTipoDrogaOutros() : " ");
+        dto.setNumeroProntuario(p.getNumeroProntuario() != null
+                ? p.getNumeroProntuario().toString() : "");
+        dto.setOrigemPaciente(RaasFormatacaoUtil.formatarOrigem(p.getOrigemPaciente()));
+        dto.setSituacaoRua(RaasFormatacaoUtil.defaultString(p.getSituacaoRua(), "N"));
+        dto.setUsuarioDrogas(RaasFormatacaoUtil.defaultString(p.getUsuarioDrogas(), "N"));
+        dto.setTipoDrogaAlcool(RaasFormatacaoUtil.defaultString(p.getTipoDrogaAlcool(), " "));
+        dto.setTipoDrogaCrack(RaasFormatacaoUtil.defaultString(p.getTipoDrogaCrack(), " "));
+        dto.setTipoDrogaOutros(RaasFormatacaoUtil.defaultString(p.getTipoDrogaOutros(), " "));
         dto.setDescricaoBairro(p.getDescricaoBairro());
-        dto.setTipoLogradouro(formatarTipoLogradouro(p.getTipoLogradouro()));
+        dto.setTipoLogradouro(RaasFormatacaoUtil.formatarTipoLogradouro(p.getTipoLogradouro()));
         dto.setEmailPaciente(p.getEmailPaciente());
+        dto.setAcoes(mapearAcoes(itens));
         return dto;
     }
 
     private PacientePsicossocialDTO mapearDadosPessoais(
             final RaasPsiPacienteProjection p) {
         final PacientePsicossocialDTO dto = new PacientePsicossocialDTO();
-        dto.setUf(formatarUf(p.getUnidadeFederacao()));
-        dto.setCompetencia(formatarCompetencia(p.getCompetencia()));
-        dto.setCnes(formatarCnes(p.getUnidadePrestadoraServico()));
-        dto.setCnsPaciente(formatarCns(p.getCartaoNacionalSaude()));
+        dto.setUf(RaasFormatacaoUtil.formatarUf(p.getUnidadeFederacao()));
+        dto.setCompetencia(RaasFormatacaoUtil.formatarCompetencia(p.getCompetencia()));
+        dto.setCnes(RaasFormatacaoUtil.formatarCnes(p.getUnidadePrestadoraServico()));
+        dto.setCnsPaciente(RaasFormatacaoUtil.formatarCns(p.getCartaoNacionalSaude()));
         dto.setCpfPaciente(p.getCpfPaciente());
-        dto.setDataInicio(formatarData(p.getDtInicioValidade()));
-        dto.setDataFim(formatarData(p.getDtFinalValidade()));
+        dto.setDataInicio(RaasFormatacaoUtil.formatarData(p.getDtInicioValidade()));
+        dto.setDataFim(RaasFormatacaoUtil.formatarData(p.getDtFinalValidade()));
         dto.setNomePaciente(p.getNmPaciente());
         dto.setNomeMae(p.getNmMae());
         dto.setLogradouro(p.getLogradouro());
         dto.setNumeroEndereco(p.getNumeroLogradouro());
         dto.setComplemento(p.getComplementoLogradouro());
         dto.setCep(p.getCep());
-        dto.setMunicipioIbge(formatarMunicipio(p.getMunicipio()));
-        dto.setDataNascimento(formatarData(p.getDtNascimento()));
+        dto.setMunicipioIbge(RaasFormatacaoUtil.formatarMunicipio(p.getMunicipio()));
+        dto.setDataNascimento(RaasFormatacaoUtil.formatarData(p.getDtNascimento()));
         dto.setSexo(p.getSexo());
-        dto.setRacaCor(formatarRaca(p.getRaca()));
+        dto.setRacaCor(RaasFormatacaoUtil.formatarRaca(p.getRaca()));
         dto.setNomeResponsavel(p.getNmResponsavel());
-        dto.setEtnia(formatarEtnia(p.getEtnia()));
+        dto.setEtnia(RaasFormatacaoUtil.formatarEtnia(p.getEtnia()));
         dto.setCelular(p.getCelular());
         dto.setTelefone(p.getTelefone());
-        dto.setMotivoSaida(formatarMotivoSaida(p.getMotivoSaidaPermanencia()));
+        dto.setMotivoSaida(RaasFormatacaoUtil.formatarMotivoSaida(p.getMotivoSaidaPermanencia()));
         dto.setCidPrincipal(p.getCidPrincipal());
-        dto.setCoberturaEsf(p.getCoberturaEsf() != null ? p.getCoberturaEsf() : "N");
-        dto.setCnesEsf(formatarCnes(p.getCodigoCoberturaEsf()));
-        dto.setDestinoPaciente(formatarDestino(p.getDestinoPaciente()));
+        dto.setCoberturaEsf(RaasFormatacaoUtil.defaultString(p.getCoberturaEsf(), "N"));
+        dto.setCnesEsf(RaasFormatacaoUtil.formatarCnes(p.getCodigoCoberturaEsf()));
+        dto.setDestinoPaciente(RaasFormatacaoUtil.formatarDestino(p.getDestinoPaciente()));
         return dto;
     }
 
@@ -139,84 +132,17 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         final List<AcaoPsicossocialDTO> acoes = new ArrayList<>();
         for (final RaasPsiItemProjection i : itens) {
             final AcaoPsicossocialDTO dto = new AcaoPsicossocialDTO();
-            dto.setProcedimento(formatarProcedimento(i.getCodProcedimento()));
+            dto.setProcedimento(RaasFormatacaoUtil.formatarProcedimento(i.getCodProcedimento()));
             dto.setCbo(i.getCodCboExecutante());
             dto.setCnsProfissional(i.getCnsExecutante());
-            dto.setDataExecucao(formatarData(i.getDtExecucaoProcedimento()));
-            dto.setClassificacao(formatarClassificacao(i.getClassificacao()));
+            dto.setDataExecucao(RaasFormatacaoUtil.formatarData(i.getDtExecucaoProcedimento()));
+            dto.setClassificacao(RaasFormatacaoUtil.formatarClassificacao(i.getClassificacao()));
             dto.setQuantidade(i.getQuantidadeRealizada() != null
                     ? i.getQuantidadeRealizada() : 1);
-            dto.setServico(formatarServico(i.getServico()));
-            dto.setLocalRealizacao(i.getLocalRealizacao() != null
-                    ? i.getLocalRealizacao() : "C");
+            dto.setServico(RaasFormatacaoUtil.formatarServico(i.getServico()));
+            dto.setLocalRealizacao(RaasFormatacaoUtil.defaultString(i.getLocalRealizacao(), "C"));
             acoes.add(dto);
         }
         return acoes;
-    }
-
-    private String formatarUf(final Integer uf) {
-        return uf != null ? String.valueOf(uf) : "52";
-    }
-
-    private String formatarCompetencia(final LocalDate competencia) {
-        return competencia != null
-                ? competencia.format(FORMATO_COMPETENCIA_HEADER) : "";
-    }
-
-    private String formatarCnes(final Integer unidade) {
-        return unidade != null ? String.valueOf(unidade) : "";
-    }
-
-    private String formatarCns(final String cns) {
-        return cns != null ? cns.replaceAll("\\D", "") : "";
-    }
-
-    private String formatarData(final LocalDate data) {
-        return data != null ? data.format(FORMATO_DATA) : "";
-    }
-
-    private String formatarMunicipio(final Integer municipio) {
-        return municipio != null ? String.valueOf(municipio) : "";
-    }
-
-    private String formatarRaca(final Integer raca) {
-        return raca != null ? String.format("%02d", raca) : "";
-    }
-
-    private String formatarEtnia(final Integer etnia) {
-        return etnia != null ? String.valueOf(etnia) : "";
-    }
-
-    private String formatarMotivoSaida(final Integer motivo) {
-        return motivo != null ? String.format("%02d", motivo) : "00";
-    }
-
-    private String formatarDestino(final Integer destino) {
-        return destino != null ? String.format("%02d", destino) : "00";
-    }
-
-    private String formatarProcedimento(final Long procedimento) {
-        return procedimento != null ? String.valueOf(procedimento) : "";
-    }
-
-    private String formatarClassificacao(final Integer classificacao) {
-        return classificacao != null
-                ? String.format("%03d", classificacao) : "001";
-    }
-
-    private String formatarServico(final Integer servico) {
-        return servico != null ? String.format("%03d", servico) : "113";
-    }
-
-    private String formatarProntuario(final Integer prontuario) {
-        return prontuario != null ? String.format("%010d", prontuario) : "";
-    }
-
-    private String formatarOrigem(final Integer origem) {
-        return origem != null ? String.format("%02d", origem) : "01";
-    }
-
-    private String formatarTipoLogradouro(final Integer tipo) {
-        return tipo != null ? String.format("%03d", tipo) : "";
     }
 }
