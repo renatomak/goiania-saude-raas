@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class RaasPsicossocialService {
 
     private static final int DIVISOR_CONTROLE = 1111;
+    public static final String LINE_SEPARATOR = "\r\n";
 
     private final RaasHeaderService headerService;
     private final RaasPacienteService pacienteService;
@@ -20,13 +21,13 @@ public class RaasPsicossocialService {
         final StringBuilder sb = new StringBuilder();
         final long campoControle = calcularCampoControle(remessa);
         sb.append(headerService.gerarHeaderLinha01(remessa.getHeader(), campoControle));
-        sb.append("\r\n");
+        sb.append(LINE_SEPARATOR);
         for (final PacientePsicossocialDTO paciente : remessa.getPacientes()) {
             sb.append(pacienteService.gerarLinha15(paciente));
-            sb.append("\r\n");
+            sb.append(LINE_SEPARATOR);
             for (final AcaoPsicossocialDTO acao : paciente.getAcoes()) {
                 sb.append(acaoService.gerarLinha16(paciente, acao));
-                sb.append("\r\n");
+                sb.append(LINE_SEPARATOR);
             }
         }
         return sb.toString();
