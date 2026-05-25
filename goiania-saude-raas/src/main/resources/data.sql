@@ -658,18 +658,26 @@ INSERT INTO tipo_atendimento (cd_tp_atendimento, ds_tipo_atendimento) VALUES
 INSERT INTO natureza_procura_tp_atendimento (cd_nat_proc_tp_atendimento, cd_tp_atendimento) VALUES
     (1, 1), (2, 2), (3, 3), (4, 4), (5, 5);
 
--- Empresas (CAPS — unidades prestadoras de serviço psicossocial)
+-- Empresas (CAPS — unidades prestadoras de serviço psicossocial de Goiânia)
+-- Esses são os 12 CAPS reais que devem aparecer no endpoint GET /v1/unidades
 INSERT INTO empresa (empresa, descricao, fantasia, cod_cid, "version", cnes, acesso_restrito, situacao_bloqueio, telefone) VALUES
-    (1001, 'CAPS AD3 NOROESTE',                 'CAPS AD3 NOROESTE',     520870, 1, '7018977', 0, 0, '6235243006'),
-    (1002, 'CAPS II SUL',                       'CAPS II SUL',           520870, 1, '3624969', 0, 0, '6235243461'),
-    (1003, 'CAPS INFANTO JUVENIL LESTE',        'CAPS IJ LESTE',         520870, 1, '5604591', 0, 0, '6235243533'),
-    (1004, 'CAPS AD III NOVO MUNDO',            'CAPS AD III NM',        520870, 1, '2337731', 0, 0, '6235241921'),
-    (1005, 'SECRETARIA MUNICIPAL DE SAUDE',     'SMS GOIANIA',           520870, 1, '2337545', 0, 0, '6235241000');
+    (   249644, 'CAPS AD III IPE',                                          'CAPS AD III IPE',        520870, 1, '2337693', 0, 0, '6235241001'),
+    (101347976, 'CAPS AD OESTE',                                            'CAPS AD OESTE',          520870, 1, '7018969', 0, 0, '6235241002'),
+    (   249646, 'CAPS AD3 NOROESTE',                                        'CAPS AD3 NOROESTE',      520870, 1, '7018977', 0, 0, '6235243006'),
+    ( 64102343, 'CAPS LIBERDADE',                                           'CAPS LIBERDADE',         520870, 1, '6928287', 0, 0, '6235241003'),
+    (   249922, 'CENTRO DE ATENCAO A SAUDE DE ALCOOLISTAS E TOXIC CAPSAD',  'CAPSAD CENTRO',          520870, 1, '2337707', 0, 0, '6235241004'),
+    (   249924, 'CENTRO DE ATENCAO PSICOSSOCIAL AGUA VIVA',                 'CAPS AGUA VIVA',         520870, 1, '2337715', 0, 0, '6235241005'),
+    (   249926, 'CENTRO DE ATENCAO PSICOSSOCIAL BEIJA FLOR',                'CAPS BEIJA FLOR',        520870, 1, '2337723', 0, 0, '6235241006'),
+    (   249928, 'CENTRO DE ATENCAO PSICOSSOCIAL ESPERANCA',                 'CAPS ESPERANCA',         520870, 1, '2337731', 0, 0, '6235241007'),
+    (   249930, 'CENTRO DE ATENCAO PSICOSSOCIAL GIRASSOL',                  'CAPS GIRASSOL',          520870, 1, '2337758', 0, 0, '6235241008'),
+    (   249932, 'CENTRO DE ATENCAO PSICOSSOCIAL NOVO MUNDO',                'CAPS NOVO MUNDO',        520870, 1, '2337766', 0, 0, '6235241009'),
+    (   249934, 'CENTRO DE ATENCAO PSICOSSOCIAL VIDA',                      'CAPS VIDA',              520870, 1, '2337774', 0, 0, '6235241010'),
+    (103205682, 'REDE CAPSI CATIVAR',                                       'CAPSI CATIVAR',          520870, 1, '9876543', 0, 0, '6235241011');
 
 -- Atendimentos e prontuário (mínimo para os scripts legados continuarem coerentes)
 INSERT INTO atendimento (nr_atendimento, cd_usu_cadsus, empresa, cd_profissional, cd_cbo, classificacao_risco, cd_nat_proc_tp_atendimento, dt_chegada, dt_atendimento, status) VALUES
-    (500001, 9282479, 1001, 3, '251510', 1, 3, '2025-12-02 08:00:00', '2025-12-02 08:30:00', 5),
-    (500002, 5128061, 1002, 4, '225170', 1, 4, '2025-12-04 09:00:00', '2025-12-04 09:30:00', 5);
+    (500001, 9282479, 249646, 3, '251510', 1, 3, '2025-12-02 08:00:00', '2025-12-02 08:30:00', 5),
+    (500002, 5128061, 249932, 4, '225170', 1, 4, '2025-12-04 09:00:00', '2025-12-04 09:30:00', 5);
 
 INSERT INTO atendimento_prontuario (id, nr_atendimento, data, tipo_registro, descricao) VALUES
     (1, 500001, '2025-12-02 08:30:00', 1, 'Acolhimento psicossocial inicial — paciente em uso de SPA.'),
@@ -690,11 +698,11 @@ INSERT INTO raas (
     (1, 1, '01', '2025-12-01', 1, 100001,
      'FATURAMENTO SMS', 'GCPAH', 25141524000123,
      'SECRETARIA MUN DE SAUDE DE GOIANIA', 'M',
-     '2025-12-31', '1.0', '202512a', 1, 1001),
+     '2025-12-31', '1.0', '202512a', 1, 249646),
     (2, 1, '01', '2026-01-01', 1, 100002,
      'FATURAMENTO SMS', 'GCPAH', 25141524000123,
      'SECRETARIA MUN DE SAUDE DE GOIANIA', 'M',
-     '2026-01-31', '1.0', '202601a', 1, 1001);
+     '2026-01-31', '1.0', '202601a', 1, 249646);
 
 -- 9.2 Pacientes RAAS PSI — 5 pacientes na competência 12/2025, 3 em 01/2026
 INSERT INTO raas_psi (
@@ -852,34 +860,48 @@ INSERT INTO raas_psi_item (
     (2009, 203, 2, 52, '2026-01-01', 5604591, '700000000000006', '2026-01-01',
      301080186, '251510', '700000000000888', '2026-01-23', 115, 2, 1, 'BPA', 'C', '00000000006');
 
--- 9.4 Arquivos RAAS já processados (para o endpoint de listar/download)
+-- 9.4 Arquivos RAAS já processados (para os endpoints de listar e download)
+-- Cada um dos 12 CAPS tem ao menos 1 registro com total_folha > 0,
+-- garantindo que apareçam em GET /v1/unidades (que faz DISTINCT em raas_processo).
 INSERT INTO raas_processo
     (mes, ano, dt_geracao, empresa, nome_empresa, path, status, total_folha, texto)
 VALUES
-    (12, 2025, '2025-12-31', 1001, 'CAPS AD3 NOROESTE',
-     'PA52123412202501.txt', '01', 5.00,
+    -- Competência 12/2025
+    (12, 2025, '2025-12-31',    249644, 'CAPS AD III IPE',
+     'PA52123412202501.txt', '01', 3.00, '01#HEADER CAPS AD III IPE'),
+    (12, 2025, '2025-12-31', 101347976, 'CAPS AD OESTE',
+     'PA52123412202502.txt', '01', 4.00, '01#HEADER CAPS AD OESTE'),
+    (12, 2025, '2025-12-31',    249646, 'CAPS AD3 NOROESTE',
+     'PA52123412202503.txt', '01', 5.00,
      '01#FATURAMENTO SMS#GCPAH#25141524000123#SECRETARIA MUN DE SAUDE DE GOIANIA#M#20251231#1.0#202512a' || E'\n' ||
      '02#700000000000001#PACIENTE TESTE UM#19850412#M'),
-    (12, 2025, '2025-12-31', 1002, 'CAPS II SUL',
-     'PA52123412202502.txt', '01', 4.00,
-     '01#FATURAMENTO SMS#GCPAH#25141524000123#SECRETARIA MUN DE SAUDE DE GOIANIA#M#20251231#1.0#202512a' || E'\n' ||
-     '02#700000000000002#PACIENTE TESTE DOIS#19900722#F'),
-    (12, 2025, '2025-12-31', 1003, 'CAPS INFANTO JUVENIL LESTE',
-     'PA52123412202503.txt', '01', 2.00,
-     '01#HEADER INFANTIL'),
-    (12, 2025, '2025-12-31', 1004, 'CAPS AD III NOVO MUNDO',
-     'PA52123412202504.txt', '02', 6.00,
-     '01#HEADER NOVO MUNDO'),
-    ( 1, 2026, '2026-01-31', 1001, 'CAPS AD3 NOROESTE',
+    (12, 2025, '2025-12-31',  64102343, 'CAPS LIBERDADE',
+     'PA52123412202504.txt', '01', 2.00, '01#HEADER CAPS LIBERDADE'),
+    (12, 2025, '2025-12-31',    249922, 'CENTRO DE ATENCAO A SAUDE DE ALCOOLISTAS E TOXIC CAPSAD',
+     'PA52123412202505.txt', '01', 6.00, '01#HEADER CAPSAD'),
+    (12, 2025, '2025-12-31',    249924, 'CENTRO DE ATENCAO PSICOSSOCIAL AGUA VIVA',
+     'PA52123412202506.txt', '01', 3.00, '01#HEADER AGUA VIVA'),
+    (12, 2025, '2025-12-31',    249926, 'CENTRO DE ATENCAO PSICOSSOCIAL BEIJA FLOR',
+     'PA52123412202507.txt', '01', 4.00, '01#HEADER BEIJA FLOR'),
+    (12, 2025, '2025-12-31',    249928, 'CENTRO DE ATENCAO PSICOSSOCIAL ESPERANCA',
+     'PA52123412202508.txt', '01', 2.00, '01#HEADER ESPERANCA'),
+    (12, 2025, '2025-12-31',    249930, 'CENTRO DE ATENCAO PSICOSSOCIAL GIRASSOL',
+     'PA52123412202509.txt', '01', 5.00, '01#HEADER GIRASSOL'),
+    (12, 2025, '2025-12-31',    249932, 'CENTRO DE ATENCAO PSICOSSOCIAL NOVO MUNDO',
+     'PA52123412202510.txt', '02', 6.00, '01#HEADER NOVO MUNDO'),
+    (12, 2025, '2025-12-31',    249934, 'CENTRO DE ATENCAO PSICOSSOCIAL VIDA',
+     'PA52123412202511.txt', '01', 3.00, '01#HEADER VIDA'),
+    (12, 2025, '2025-12-31', 103205682, 'REDE CAPSI CATIVAR',
+     'PA52123412202512.txt', '01', 4.00, '01#HEADER CAPSI CATIVAR'),
+    -- Competência 01/2026 (alguns CAPS para testar filtro por mes/ano)
+    ( 1, 2026, '2026-01-31',    249646, 'CAPS AD3 NOROESTE',
      'PA52123401202601.txt', '01', 3.00,
      '01#FATURAMENTO SMS#GCPAH#25141524000123#SECRETARIA MUN DE SAUDE DE GOIANIA#M#20260131#1.0#202601a'),
-    ( 1, 2026, '2026-01-31', 1004, 'CAPS AD III NOVO MUNDO',
-     'PA52123401202602.txt', '01', 4.00,
-     '01#HEADER NOVO MUNDO JAN'),
-    -- registro com total_folha = 0 (NÃO deve aparecer na listagem; útil p/ teste negativo)
-    (11, 2025, '2025-11-30', 1005, 'SECRETARIA MUNICIPAL DE SAUDE',
-     'PA52123411202500.txt', '01', 0.00,
-     '01#HEADER VAZIO');
+    ( 1, 2026, '2026-01-31',    249932, 'CENTRO DE ATENCAO PSICOSSOCIAL NOVO MUNDO',
+     'PA52123401202602.txt', '01', 4.00, '01#HEADER NOVO MUNDO JAN'),
+    -- registro com total_folha = 0 (NÃO deve aparecer em /v1/raas; mas mantém empresa em /v1/unidades)
+    (11, 2025, '2025-11-30',    249644, 'CAPS AD III IPE',
+     'PA52123411202500.txt', '01', 0.00, '01#HEADER ZERO');
 
 -- ============================================================================
 -- 10. PERMISSÕES PARA O USUÁRIO local
@@ -907,10 +929,10 @@ ALTER ROLE local IN DATABASE goiania_saude_local SET search_path = goiania_saude
 \echo '  Schema   : goiania_saude'
 \echo ''
 \echo '  Dados de teste:'
-\echo '    - 5 empresas (CAPS)'
+\echo '    - 12 empresas (CAPS de Goiania)'
 \echo '    - 2 cabeçalhos RAAS (competências 12/2025 e 01/2026)'
 \echo '    - 8 pacientes (raas_psi)  / 29 procedimentos (raas_psi_item)'
-\echo '    - 7 arquivos processados (raas_processo)'
+\echo '    - 15 arquivos processados (raas_processo)'
 \echo ''
 \echo '  Subir aplicação com:'
 \echo '    mvn spring-boot:run -Dspring-boot.run.profiles=local'
