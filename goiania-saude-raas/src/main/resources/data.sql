@@ -1,41 +1,104 @@
--- ==========================================================================
--- DATA.SQL — Ambiente local/test (PostgreSQL embutido)
--- Recria o schema e insere dados baseados nos DDLs e respostas fornecidas
--- ==========================================================================
+-- ============================================================================
+--  data.sql — Bootstrap completo do ambiente LOCAL (PostgreSQL)
+--  Projeto : goiania-saude-raas
+--  Banco   : goiania_saude_local
+--  Usuário : local
+--  Senha   : local
+--  Schema  : goiania_saude  (igual ao default_schema do application.yml)
+--
+--  COMO EXECUTAR (a partir de um usuário com privilégio de SUPERUSER):
+--     psql -U postgres -h localhost -f data.sql
+--
+--  Em seguida, suba a aplicação com o profile "local":
+--     mvn spring-boot:run -Dspring-boot.run.profiles=local
+--     # ou
+--     java -jar target/raas-1.0.0-SNAPSHOT.jar --spring.profiles.active=local
+--
+--  O script é IDEMPOTENTE — pode ser re-executado a qualquer momento.
+-- ============================================================================
 
--- 1. DROP em ordem inversa ------------------------------------------------
-DROP TABLE IF EXISTS raas_processo;
-DROP TABLE IF EXISTS empresa;
-DROP TABLE IF EXISTS atendimento_prontuario;
-DROP TABLE IF EXISTS aih;
-DROP TABLE IF EXISTS atendimento;
-DROP TABLE IF EXISTS tabela_cbo;
-DROP TABLE IF EXISTS classificacao_risco;
-DROP TABLE IF EXISTS natureza_procura_tp_atendimento;
-DROP TABLE IF EXISTS tipo_atendimento;
-DROP TABLE IF EXISTS vac_aplicacao;
-DROP TABLE IF EXISTS rnds_integracao_vacina;
-DROP TABLE IF EXISTS produto_vacina;
-DROP TABLE IF EXISTS produtos;
-DROP TABLE IF EXISTS fabricante_medicamento;
-DROP TABLE IF EXISTS via_administracao;
-DROP TABLE IF EXISTS local_aplicacao;
-DROP TABLE IF EXISTS grupo_atendimento_vacinacao_esus;
-DROP TABLE IF EXISTS profissional;
-DROP TABLE IF EXISTS orgao_emissor;
-DROP TABLE IF EXISTS empresa;
-DROP TABLE IF EXISTS tipo_vacina;
-DROP TABLE IF EXISTS calendario;
-DROP TABLE IF EXISTS usuario_cadsus;
-DROP TABLE IF EXISTS endereco_usuario_cadsus;
-DROP TABLE IF EXISTS tipo_logradouro_cadsus;
-DROP TABLE IF EXISTS etnia_indigena;
-DROP TABLE IF EXISTS raca;
-DROP TABLE IF EXISTS nacionalidade;
-DROP TABLE IF EXISTS cidade;
-DROP TABLE IF EXISTS estado;
+-- ----------------------------------------------------------------------------
+-- 0. Encerra conexões abertas, dropa banco e role (idempotência)
+-- ----------------------------------------------------------------------------
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE datname = 'goiania_saude_local'
+  AND pid <> pg_backend_pid();
 
--- 2. CRIAÇÃO DAS TABELAS --------------------------------------------------
+DROP DATABASE IF EXISTS goiania_saude_local;
+DROP ROLE     IF EXISTS local;
+
+-- ----------------------------------------------------------------------------
+-- 1. Cria role / usuário da aplicação
+-- ----------------------------------------------------------------------------
+CREATE ROLE local WITH LOGIN PASSWORD 'local' CREATEDB;
+
+-- ----------------------------------------------------------------------------
+-- 2. Cria banco de dados
+-- ----------------------------------------------------------------------------
+CREATE DATABASE goiania_saude_local
+    WITH OWNER     = local
+         ENCODING  = 'UTF8'
+         TEMPLATE  = template0
+         LC_COLLATE = 'C'
+         LC_CTYPE   = 'C';
+
+COMMENT ON DATABASE goiania_saude_local IS
+    'Banco local para testes da aplicação goiania-saude-raas';
+
+-- ----------------------------------------------------------------------------
+-- 3. Conecta no novo banco
+-- ----------------------------------------------------------------------------
+\connect goiania_saude_local
+
+-- ----------------------------------------------------------------------------
+-- 4. Cria schema goiania_saude (mesmo nome do default_schema da aplicação)
+-- ----------------------------------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS goiania_saude AUTHORIZATION local;
+GRANT ALL ON SCHEMA goiania_saude TO local;
+
+SET search_path TO goiania_saude, public;
+
+-- ============================================================================
+-- 5. DROP TABLES (ordem inversa para evitar dependência)
+-- ============================================================================
+DROP TABLE IF EXISTS goiania_saude.raas_psi_item            CASCADE;
+DROP TABLE IF EXISTS goiania_saude.raas_psi                 CASCADE;
+DROP TABLE IF EXISTS goiania_saude.raas                     CASCADE;
+DROP TABLE IF EXISTS goiania_saude.raas_processo            CASCADE;
+
+DROP TABLE IF EXISTS goiania_saude.rnds_integracao_vacina   CASCADE;
+DROP TABLE IF EXISTS goiania_saude.vac_aplicacao            CASCADE;
+DROP TABLE IF EXISTS goiania_saude.atendimento_prontuario   CASCADE;
+DROP TABLE IF EXISTS goiania_saude.aih                      CASCADE;
+DROP TABLE IF EXISTS goiania_saude.atendimento              CASCADE;
+DROP TABLE IF EXISTS goiania_saude.natureza_procura_tp_atendimento CASCADE;
+DROP TABLE IF EXISTS goiania_saude.tipo_atendimento         CASCADE;
+DROP TABLE IF EXISTS goiania_saude.classificacao_risco      CASCADE;
+DROP TABLE IF EXISTS goiania_saude.tabela_cbo               CASCADE;
+DROP TABLE IF EXISTS goiania_saude.produto_vacina           CASCADE;
+DROP TABLE IF EXISTS goiania_saude.produtos                 CASCADE;
+DROP TABLE IF EXISTS goiania_saude.fabricante_medicamento   CASCADE;
+DROP TABLE IF EXISTS goiania_saude.grupo_atendimento_vacinacao_esus CASCADE;
+DROP TABLE IF EXISTS goiania_saude.local_aplicacao          CASCADE;
+DROP TABLE IF EXISTS goiania_saude.via_administracao        CASCADE;
+DROP TABLE IF EXISTS goiania_saude.profissional             CASCADE;
+DROP TABLE IF EXISTS goiania_saude.orgao_emissor            CASCADE;
+DROP TABLE IF EXISTS goiania_saude.empresa                  CASCADE;
+DROP TABLE IF EXISTS goiania_saude.calendario               CASCADE;
+DROP TABLE IF EXISTS goiania_saude.tipo_vacina              CASCADE;
+DROP TABLE IF EXISTS goiania_saude.usuario_cadsus           CASCADE;
+DROP TABLE IF EXISTS goiania_saude.endereco_usuario_cadsus  CASCADE;
+DROP TABLE IF EXISTS goiania_saude.tipo_logradouro_cadsus   CASCADE;
+DROP TABLE IF EXISTS goiania_saude.nacionalidade            CASCADE;
+DROP TABLE IF EXISTS goiania_saude.etnia_indigena           CASCADE;
+DROP TABLE IF EXISTS goiania_saude.raca                     CASCADE;
+DROP TABLE IF EXISTS goiania_saude.cidade                   CASCADE;
+DROP TABLE IF EXISTS goiania_saude.estado                   CASCADE;
+
+-- ============================================================================
+-- 6. TABELAS LEGADAS (mantidas para compatibilidade com scripts anteriores)
+-- ============================================================================
 
 CREATE TABLE estado (
     cod_est   INTEGER PRIMARY KEY,
@@ -43,7 +106,7 @@ CREATE TABLE estado (
 );
 
 CREATE TABLE cidade (
-    cod_cid   INTEGER PRIMARY KEY,
+    cod_cid   BIGINT PRIMARY KEY,
     descricao VARCHAR(100) NOT NULL,
     cod_est   INTEGER NOT NULL
 );
@@ -61,7 +124,7 @@ CREATE TABLE endereco_usuario_cadsus (
     nr_logradouro      VARCHAR(10),
     cep                VARCHAR(10),
     nm_bairro          VARCHAR(50),
-    cod_cid            INTEGER NOT NULL,
+    cod_cid            BIGINT  NOT NULL,
     cd_tipo_logradouro INTEGER NOT NULL
 );
 
@@ -135,45 +198,10 @@ CREATE TABLE calendario (
     cod_estrategia_pni SMALLINT NOT NULL DEFAULT 0
 );
 
-CREATE TABLE fabricante_medicamento (
-    cd_fabricante INTEGER PRIMARY KEY,
-    ds_fabricante VARCHAR(50) NOT NULL,
-    "version"     BIGINT DEFAULT 0 NOT NULL,
-    cnpj          VARCHAR(15)
-);
-
-CREATE TABLE produtos (
-    cod_pro                                VARCHAR(13) PRIMARY KEY,
-    cod_uni                                NUMERIC(12) NOT NULL DEFAULT 1,
-    cod_gru                                INTEGER     NOT NULL DEFAULT 1,
-    cod_sub                                INTEGER     NOT NULL DEFAULT 1,
-    descricao                              VARCHAR(200) NOT NULL,
-    cont_min                               CHAR(1)     NOT NULL DEFAULT 'N',
-    usuario                                INTEGER     NOT NULL DEFAULT 1,
-    dt_usuario                             DATE        NOT NULL DEFAULT CURRENT_DATE,
-    dt_cadastro                            DATE        NOT NULL DEFAULT CURRENT_DATE,
-    "version"                              BIGINT      DEFAULT 0 NOT NULL,
-    flag_permite_disp_mais                 VARCHAR(1)  NOT NULL DEFAULT 'N',
-    flag_emprestimo                        SMALLINT    NOT NULL DEFAULT 0,
-    flag_tratamento_prolongado_antibiotico SMALLINT    NOT NULL DEFAULT 0,
-    flag_ativo                             SMALLINT    NOT NULL DEFAULT 1,
-    flag_disp_ped_lic                      SMALLINT    NOT NULL DEFAULT 0,
-    cd_fabricante                          INTEGER,
-    fabricante_esus                        VARCHAR(150)
-);
-
-CREATE TABLE produto_vacina (
-    cd_produto_vacina BIGINT PRIMARY KEY,
-    cod_pro           VARCHAR(13) NOT NULL,
-    cd_vacina         INTEGER     NOT NULL,
-    qt_dose           SMALLINT    NOT NULL DEFAULT 1,
-    "version"         BIGINT      DEFAULT 0 NOT NULL
-);
-
 CREATE TABLE empresa (
     empresa           INTEGER PRIMARY KEY,
-    descricao         VARCHAR(60) NOT NULL,
-    fantasia          VARCHAR(60),
+    descricao         VARCHAR(120) NOT NULL,
+    fantasia          VARCHAR(120),
     cod_cid           BIGINT      NOT NULL DEFAULT 1,
     "version"         BIGINT      DEFAULT 0 NOT NULL,
     cnes              VARCHAR(7),
@@ -218,15 +246,39 @@ CREATE TABLE grupo_atendimento_vacinacao_esus (
     "version"                     BIGINT  NOT NULL DEFAULT 1
 );
 
-CREATE TABLE rnds_integracao_vacina (
-    cd_rnds_integracao_vacina BIGINT     PRIMARY KEY,
-    cd_vac_aplicacao          BIGINT     NOT NULL,
-    uuid_rnds                 VARCHAR,
-    uuid_origem               VARCHAR    NOT NULL DEFAULT '',
-    situacao                  SMALLINT   NOT NULL DEFAULT 0,
-    cd_usuario                NUMERIC(6) NOT NULL DEFAULT 1,
-    dt_usuario                TIMESTAMP  NOT NULL DEFAULT NOW(),
-    "version"                 BIGINT     NOT NULL DEFAULT 1
+CREATE TABLE fabricante_medicamento (
+    cd_fabricante INTEGER PRIMARY KEY,
+    ds_fabricante VARCHAR(50) NOT NULL,
+    "version"     BIGINT DEFAULT 0 NOT NULL,
+    cnpj          VARCHAR(15)
+);
+
+CREATE TABLE produtos (
+    cod_pro                                VARCHAR(13) PRIMARY KEY,
+    cod_uni                                NUMERIC(12) NOT NULL DEFAULT 1,
+    cod_gru                                INTEGER     NOT NULL DEFAULT 1,
+    cod_sub                                INTEGER     NOT NULL DEFAULT 1,
+    descricao                              VARCHAR(200) NOT NULL,
+    cont_min                               CHAR(1)     NOT NULL DEFAULT 'N',
+    usuario                                INTEGER     NOT NULL DEFAULT 1,
+    dt_usuario                             DATE        NOT NULL DEFAULT CURRENT_DATE,
+    dt_cadastro                            DATE        NOT NULL DEFAULT CURRENT_DATE,
+    "version"                              BIGINT      DEFAULT 0 NOT NULL,
+    flag_permite_disp_mais                 VARCHAR(1)  NOT NULL DEFAULT 'N',
+    flag_emprestimo                        SMALLINT    NOT NULL DEFAULT 0,
+    flag_tratamento_prolongado_antibiotico SMALLINT    NOT NULL DEFAULT 0,
+    flag_ativo                             SMALLINT    NOT NULL DEFAULT 1,
+    flag_disp_ped_lic                      SMALLINT    NOT NULL DEFAULT 0,
+    cd_fabricante                          INTEGER,
+    fabricante_esus                        VARCHAR(150)
+);
+
+CREATE TABLE produto_vacina (
+    cd_produto_vacina BIGINT PRIMARY KEY,
+    cod_pro           VARCHAR(13) NOT NULL,
+    cd_vacina         INTEGER     NOT NULL,
+    qt_dose           SMALLINT    NOT NULL DEFAULT 1,
+    "version"         BIGINT      DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE tabela_cbo (
@@ -316,17 +368,160 @@ CREATE TABLE vac_aplicacao (
     status_baixa              SMALLINT    NOT NULL DEFAULT 0
 );
 
--- 3. DADOS BASE -----------------------------------------------------------
+CREATE TABLE rnds_integracao_vacina (
+    cd_rnds_integracao_vacina BIGINT     PRIMARY KEY,
+    cd_vac_aplicacao          BIGINT     NOT NULL,
+    uuid_rnds                 VARCHAR,
+    uuid_origem               VARCHAR    NOT NULL DEFAULT '',
+    situacao                  SMALLINT   NOT NULL DEFAULT 0,
+    cd_usuario                NUMERIC(6) NOT NULL DEFAULT 1,
+    dt_usuario                TIMESTAMP  NOT NULL DEFAULT NOW(),
+    "version"                 BIGINT     NOT NULL DEFAULT 1
+);
+
+-- ============================================================================
+-- 7. TABELAS USADAS PELA APLICAÇÃO RAAS
+--    (alinhadas com as entidades JPA / native queries dos repositórios)
+-- ============================================================================
+
+-- 7.1 raas — cabeçalho da remessa (RaasEntity / RaasHeaderProjection)
+CREATE TABLE raas (
+    cd_raas                  BIGINT       PRIMARY KEY,
+    linha                    INTEGER,
+    indicador_inicio         VARCHAR(10),
+    competencia              DATE         NOT NULL,
+    quantidade_folhas        BIGINT,
+    campo_controle           BIGINT,
+    nm_orgao_origem          VARCHAR(100),
+    sigla_orgao_origem       VARCHAR(20),
+    cgc_prestador            BIGINT,
+    nm_orgao_destino         VARCHAR(100),
+    indicador_orgao_destino  VARCHAR(10),
+    dt_geracao               DATE,
+    versao                   VARCHAR(20),
+    versao_bdsia             VARCHAR(20),
+    status                   INTEGER      NOT NULL DEFAULT 1,
+    empresa                  BIGINT
+);
+
+CREATE INDEX idx_raas_competencia ON raas (competencia);
+CREATE INDEX idx_raas_empresa     ON raas (empresa);
+
+-- 7.2 raas_psi — paciente psicossocial (RaasPsiEntity / RaasPsiPacienteProjection)
+CREATE TABLE raas_psi (
+    cd_raas_psi                BIGINT        PRIMARY KEY,
+    cd_raas                    BIGINT,
+    linha                      INTEGER,
+    unidade_federacao          INTEGER,
+    competencia                DATE          NOT NULL,
+    unidade_prestadora_servico INTEGER,
+    cartao_nacional_saude      VARCHAR(15),
+    dt_inicio_validade         DATE,
+    dt_final_validade          DATE,
+    nm_paciente                VARCHAR(200),
+    numero_prontuario          INTEGER,
+    nm_mae                     VARCHAR(200),
+    logradouro                 VARCHAR(200),
+    numero_logradouro          VARCHAR(10),
+    complemento_logradouro     VARCHAR(50),
+    cep                        VARCHAR(10),
+    municipio                  INTEGER,
+    dt_nascimento              DATE,
+    sexo                       CHAR(1),
+    raca                       INTEGER,
+    nm_responsavel             VARCHAR(200),
+    nacionalidade              INTEGER,
+    etnia                      INTEGER,
+    telefone                   VARCHAR(15),
+    celular                    VARCHAR(15),
+    motivo_saida_permanencia   INTEGER,
+    dt_ocorrencia              DATE,
+    cid_principal              VARCHAR(10),
+    cid_secundario_1           VARCHAR(10),
+    cid_secundario_2           VARCHAR(10),
+    cid_secundario_3           VARCHAR(10),
+    cid_causas_associadas      VARCHAR(10),
+    carater_atendimento        INTEGER,
+    origem_paciente            INTEGER,
+    cobertura_esf              VARCHAR(1),
+    codigo_cobertura_esf       INTEGER,
+    total_procedimentos        INTEGER,
+    destino_paciente           INTEGER,
+    origem_informacoes         VARCHAR(10),
+    situacao_rua               VARCHAR(1),
+    usuario_drogas             VARCHAR(1),
+    tipo_droga_alcool          VARCHAR(1),
+    tipo_droga_crack           VARCHAR(1),
+    tipo_droga_outros          VARCHAR(1),
+    numero_autorizacao         BIGINT,
+    descricao_bairro           VARCHAR(100),
+    tipo_logradouro            INTEGER,
+    email_paciente             VARCHAR(100),
+    cpf_paciente               VARCHAR(14),
+    CONSTRAINT fk_raas_psi_raas FOREIGN KEY (cd_raas)
+        REFERENCES raas (cd_raas) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_raas_psi_competencia ON raas_psi (competencia);
+CREATE INDEX idx_raas_psi_cd_raas     ON raas_psi (cd_raas);
+CREATE INDEX idx_raas_psi_cnes        ON raas_psi (unidade_prestadora_servico);
+
+-- 7.3 raas_psi_item — procedimentos do paciente (RaasPsiItemEntity / RaasPsiItemProjection)
+CREATE TABLE raas_psi_item (
+    cd_raas_psi_item           BIGINT       PRIMARY KEY,
+    cd_raas_psi                BIGINT       NOT NULL,
+    linha                      INTEGER,
+    unidade_federacao          INTEGER,
+    competencia                DATE,
+    unidade_prestadora_servico INTEGER,
+    cartao_nacional_saude      VARCHAR(15),
+    dt_inicio_validade         DATE,
+    cod_procedimento           BIGINT,
+    cod_cbo_executante         VARCHAR(10),
+    cns_executante             VARCHAR(15),
+    dt_execucao_procedimento   DATE,
+    servico                    INTEGER,
+    classificacao              INTEGER,
+    quantidade_realizada       INTEGER,
+    origem_informacoes         VARCHAR(10),
+    local_realizacao           VARCHAR(1),
+    cpf_paciente               VARCHAR(14),
+    CONSTRAINT fk_raas_psi_item_paciente FOREIGN KEY (cd_raas_psi)
+        REFERENCES raas_psi (cd_raas_psi) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_raas_psi_item_cd_raas_psi ON raas_psi_item (cd_raas_psi);
+CREATE INDEX idx_raas_psi_item_competencia ON raas_psi_item (competencia);
+
+-- 7.4 raas_processo — arquivos RAAS gerados (ArquivosRaasEntity)
+CREATE TABLE raas_processo (
+    cd_raas_processo BIGSERIAL    PRIMARY KEY,
+    mes              INTEGER      NOT NULL,
+    ano              INTEGER      NOT NULL,
+    dt_geracao       DATE,
+    empresa          BIGINT       NOT NULL,
+    nome_empresa     VARCHAR(200),
+    path             VARCHAR(255),
+    status           VARCHAR(2)   NOT NULL,
+    total_folha      NUMERIC(15,2),
+    texto            TEXT
+);
+
+CREATE INDEX idx_raas_processo_empresa ON raas_processo (empresa);
+CREATE INDEX idx_raas_processo_periodo ON raas_processo (ano, mes);
+
+-- ============================================================================
+-- 8. INSERTS — DADOS BASE (legados)
+-- ============================================================================
 
 INSERT INTO estado (cod_est, sigla) VALUES
-    (1, 'GO'),
-    (2, 'SP'),
-    (3, 'RJ');
+    (1, 'GO'), (2, 'SP'), (3, 'RJ');
 
 INSERT INTO cidade (cod_cid, descricao, cod_est) VALUES
-    (151, 'GOIANIA',              1),
-    (152, 'APARECIDA DE GOIANIA', 1),
-    (200, 'SAO PAULO',            2);
+    (151,    'GOIANIA',              1),
+    (152,    'APARECIDA DE GOIANIA', 1),
+    (200,    'SAO PAULO',            2),
+    (520870, 'GOIANIA',              1);
 
 INSERT INTO tipo_logradouro_cadsus (cd_tipo_logradouro, ds_tipo_logradouro) VALUES
     (81, 'RUA'),
@@ -336,15 +531,16 @@ INSERT INTO tipo_logradouro_cadsus (cd_tipo_logradouro, ds_tipo_logradouro) VALU
 INSERT INTO endereco_usuario_cadsus
     (cd_endereco, keyword, nm_logradouro, nm_comp_logradouro, nr_logradouro, cep, nm_bairro, cod_cid, cd_tipo_logradouro)
 VALUES
-    (7230412, 'K1', 'C 149',    'QD 325 LT 11', 'SN',   '74230050', 'JARDIM AMERICA',              151, 81),
-    (7230413, 'K2', 'AVENIDA GOIAS', NULL,       '1500', '74000100', 'CENTRO',                      151, 82),
-    (7230415, 'K4', 'RB 51 A',  'QD 51 LT 72',  'SN',   '74474396', 'Residencial Recanto do Bosque', 520870, 81);
+    (7230412, 'K1', 'C 149',           'QD 325 LT 11',                  'SN',   '74230050', 'JARDIM AMERICA',                151,    81),
+    (7230413, 'K2', 'AVENIDA GOIAS',    NULL,                            '1500', '74000100', 'CENTRO',                        151,    82),
+    (7230414, 'K3', 'CV18',             'RESIDENCIAL CENTER VILLE',     'SN',   '74905450', 'RESIDENCIAL CENTER VILLE',      520870, 81),
+    (7230415, 'K4', 'RB 51 A',          'QD 51 LT 72',                   'SN',   '74474396', 'Residencial Recanto do Bosque', 520870, 81);
 
 INSERT INTO raca (cd_raca, ds_raca, "version", version_all) VALUES
-    (1, 'BRANCA',   1, 1),
-    (2, 'PRETA',    1, 2),
-    (3, 'AMARELA',  1, 3),
-    (4, 'PARDA',    1, 4),
+    (1, 'BRANCA', 1, 1),
+    (2, 'PRETA', 1, 2),
+    (3, 'AMARELA', 1, 3),
+    (4, 'PARDA', 1, 4),
     (5, 'INDIGENA', 1, 5);
 
 INSERT INTO etnia_indigena (cd_etnia, ds_etnia, "version", version_all) VALUES
@@ -354,29 +550,34 @@ INSERT INTO etnia_indigena (cd_etnia, ds_etnia, "version", version_all) VALUES
 
 INSERT INTO nacionalidade (cd_pais, ds_pais, "version", version_all) VALUES
     (1, 'BRASIL',    1, 1),
-    (2, 'ARGENTINA', 1, 2),
-    (3, 'PORTUGAL',  1, 3);
+    (10, 'BRASILEIRO',1, 2),
+    (2, 'ARGENTINA', 1, 3),
+    (3, 'PORTUGAL',  1, 4);
 
 INSERT INTO usuario_cadsus (
     cd_usu_cadsus, nm_usuario, sg_sexo, nm_mae, nm_pai, email, cpf, dt_nascimento,
     cd_pais_nascimento, cd_raca, cd_etnia, nr_telefone, nr_telefone_2, apelido,
     cod_cid_nascimento, cd_endereco
 ) VALUES
-    (3033700, 'MARIA EDUARDA HUMMEL OLIVEIRA', 'F',
+    (3033700, 'MARIA EDUARDA HUMMEL OLIVEIRA',     'F',
      'ANA PAULA HUMMEL OLIVEIRA', 'ADRIANO DE OLIVEIRA',
      'mariaeduarda@email.com', '05342621180', '2006-05-18',
      1, 1, 1, '62991632742', '62991632743', 'MARIA EDUARDA', 151, 7230412),
+    (5128061, 'DORVALINA FERREIRA DA MOTA MOCK',  'F',
+     'FRANCISCA FERREIRA DA MOTA', NULL,
+     NULL, '96748257115', '1952-11-11',
+     1, 4, NULL, '62984061234', NULL, NULL, 520870, 7230414),
     (9282479, 'THALLYA VALENTINA GOMES RAMOS MOCK', 'F',
      'NAYANNE GOMES SODRE RAMOS', 'MACKSON DE SOUSA RAMOS',
      NULL, '12169441131', '2024-06-30',
      1, 4, NULL, '62998702201', NULL, NULL, 520870, 7230415);
 
 INSERT INTO tipo_vacina (cd_vacina, ds_vacina, cod_gru, cod_sub, "version", version_all) VALUES
-    (1, 'COVID-19',       1, 1, 1, 1),
-    (2, 'INFLUENZA',      1, 2, 1, 2),
-    (3, 'FEBRE AMARELA',  1, 3, 1, 3),
-    (4, 'HEPATITE B',     2, 1, 1, 4),
-    (5, 'TETANO',         2, 2, 1, 5);
+    (1, 'COVID-19', 1, 1, 1, 1),
+    (2, 'INFLUENZA', 1, 2, 1, 2),
+    (3, 'FEBRE AMARELA', 1, 3, 1, 3),
+    (4, 'HEPATITE B', 2, 1, 1, 4),
+    (5, 'TETANO', 2, 2, 1, 5);
 
 INSERT INTO calendario (cd_calendario, ds_calendario, "version", padrao, flag_atualizacao, flag_aprazamento, cod_estrategia_pni) VALUES
     (1, 'Rotina',   1, 'S', 0, 0, 1),
@@ -384,10 +585,11 @@ INSERT INTO calendario (cd_calendario, ds_calendario, "version", padrao, flag_at
     (3, 'Especial', 1, 'N', 0, 0, 3);
 
 INSERT INTO fabricante_medicamento (cd_fabricante, ds_fabricante, "version", cnpj) VALUES
-    (1, 'PFIZER',         1, '58006628000120'),
-    (2, 'ASTRAZENECA',    1, '60318797000117'),
-    (3, 'BUTANTAN',       1, '53373484000113'),
-    (4, 'BIO-MANGUINHOS', 1, '33781055000135');
+    (1, 'PFIZER',          1, '58006628000120'),
+    (2, 'ASTRAZENECA',     1, '60318797000117'),
+    (3, 'BUTANTAN',        1, '53373484000113'),
+    (4, 'BIO-MANGUINHOS',  1, '33781055000135'),
+    (5, 'FUNDACAO BUTANTAN', 1, '60501293000176');
 
 INSERT INTO produtos (
     cod_pro, cod_uni, cod_gru, cod_sub, descricao, cont_min,
@@ -395,26 +597,24 @@ INSERT INTO produtos (
     flag_permite_disp_mais, flag_emprestimo, flag_tratamento_prolongado_antibiotico,
     flag_ativo, flag_disp_ped_lic, cd_fabricante, fabricante_esus
 ) VALUES
-    ('COMIRNATY01', 1, 1, 1, 'COMIRNATY - COVID-19 BNT162b2',       'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 1, 'Pfizer-BioNTech'),
-    ('VACFLU01',    1, 1, 2, 'VACINA INFLUENZA TRIVALENTE',          'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 3, 'Butantan'),
-    ('FAMAMAR01',   1, 1, 3, 'VACINA FEBRE AMARELA 17DD ATENUADA',   'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 4, 'Bio-Manguinhos');
+    ('COMIRNATY01', 1, 1, 1, 'COMIRNATY - COVID-19 BNT162b2',     'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 1, 'Pfizer-BioNTech'),
+    ('VACFLU01',    1, 1, 2, 'VACINA INFLUENZA TRIVALENTE',        'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 3, 'Butantan'),
+    ('FAMAMAR01',   1, 1, 3, 'VACINA FEBRE AMARELA 17DD ATENUADA', 'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 4, 'Bio-Manguinhos');
 
 INSERT INTO produto_vacina (cd_produto_vacina, cod_pro, cd_vacina, qt_dose, "version") VALUES
     (1, 'COMIRNATY01', 1, 2, 1),
     (2, 'VACFLU01',    2, 1, 1),
     (3, 'FAMAMAR01',   3, 1, 1);
 
-INSERT INTO empresa (empresa, descricao, fantasia, cod_cid, "version", cnes, acesso_restrito, situacao_bloqueio) VALUES
-    (1, 'UBS JARDIM AMERICA', 'UBS Jardim America', 151, 1, '1234567', 0, 0),
-    (2, 'UBS CENTRO',         'UBS Centro',         151, 1, '7654321', 0, 0);
-
 INSERT INTO orgao_emissor (cd_orgao_emissor, ds_orgao_emissor, sg_orgao_emissor, "version", version_all) VALUES
     (1, 'CONSELHO FEDERAL DE MEDICINA',   'CRM',   1, 1),
     (2, 'CONSELHO FEDERAL DE ENFERMAGEM', 'COREN', 1, 2);
 
 INSERT INTO profissional (cd_profissional, nm_profissional, nr_registro, cd_cns, cd_con_classe, "version", version_all) VALUES
-    (1, 'DR. JOAO DA SILVA', 'CRM-GO 12345',   '123456789012345', 1, 1, 1),
-    (2, 'ENF. MARIA SOUZA',  'COREN-GO 98765', '987654321098765', 2, 1, 2);
+    (1, 'DR. JOAO DA SILVA',     'CRM-GO 12345',   '123456789012345', 1, 1, 1),
+    (2, 'ENF. MARIA SOUZA',      'COREN-GO 98765', '987654321098765', 2, 1, 2),
+    (3, 'PSIC. CARLOS PEREIRA',  'CRP-GO 7777',    '700000000000777', 2, 1, 3),
+    (4, 'TER. OCUP. ANA LIMA',   'CREFITO 8888',   '700000000000888', 2, 1, 4);
 
 INSERT INTO via_administracao (cd_via_administracao, descricao, "version") VALUES
     (1, 'INTRAMUSCULAR', 1),
@@ -434,267 +634,13 @@ INSERT INTO grupo_atendimento_vacinacao_esus (cd_grupo_atendimento_vac_esus, des
     (3, 'GESTANTES',              1),
     (4, 'PROFISSIONAIS DE SAUDE', 1);
 
--- 4. APLICAÇÕES DE VACINA (paciente 9282479 — Thallya Valentina Gomes Ramos) ----------
--- (lookup data: fabricantes 6-9, tipo_vacina 6-13, produtos, profissionais 4-7 inseridos na seção 9)
-
-INSERT INTO vac_aplicacao (
-    cd_vac_aplicacao, cd_usu_cadsus, cd_vacina, ds_vacina, cd_usuario,
-    dt_aplicacao, dt_cadastro, status, observacao,
-    cd_calendario, cd_estrategia, lote, cd_produto_vacina,
-    empresa, dt_validade, cd_profissional_aplicacao,
-    grupo_atendimento, flag_gestante, novo_frasco, cd_doses,
-    flag_historico, flag_puerpera, flag_fora_esquema_vacinal,
-    turno, local_atendimento, viajante,
-    cd_via_administracao, cd_local_aplicacao,
-    "version", comunicante_hanseniase, status_baixa
-) VALUES
-    -- VACINA POLIO INJETÁVEL 3ª Dose (2025-02-10)
-    (712879059, 9282479, 6, 'VACINA POLIO INJETÁVEL', 1,
-     '2025-02-10 09:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'POLIO25C', 5, 3, '2026-12-31 00:00:00', 4,
-     1, 0, 0, 3, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA PENTA (DTP/HEPB/HIB) 3ª Dose — PANACEA (2025-02-10)
-    (712878831, 9282479, 7, 'VACINA PENTA (DTP/HEPB/HIB)', 1,
-     '2025-02-10 09:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'PENTA25A', 6, 3, '2026-12-31 00:00:00', 4,
-     1, 0, 0, 3, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA MENINGO C 2ª Dose — GSK (2025-01-06)
-    (696637875, 9282479, 8, 'VACINA MENINGO C', 1,
-     '2025-01-06 10:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'MENC25A', 8, 3, '2026-12-31 00:00:00', 5,
-     1, 0, 0, 2, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA ROTAVIRUS 2ª Dose — FIOCRUZ (2024-11-25)
-    (680761498, 9282479, 9, 'VACINA ROTAVIRUS', 1,
-     '2024-11-25 08:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'ROTA24B', 9, 3, '2025-12-31 00:00:00', 4,
-     1, 0, 0, 2, 0, 0, 0, 1, 1, 0, 3, 1, 1, 0, 0),
-    -- VACINA POLIO INJETÁVEL 2ª Dose — FIOCRUZ (2024-11-25)
-    (680760572, 9282479, 6, 'VACINA POLIO INJETÁVEL', 1,
-     '2024-11-25 08:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'POLIO24B', 5, 3, '2025-12-31 00:00:00', 4,
-     1, 0, 0, 2, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA PNEUMO 10 2ª Dose — FIOCRUZ (2024-11-25)
-    (680750914, 9282479, 10, 'VACINA PNEUMO 10', 1,
-     '2024-11-25 08:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'PNEUMO24B', 10, 3, '2025-12-31 00:00:00', 4,
-     1, 0, 0, 2, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA PENTA (DTP/HEPB/HIB) 2ª Dose — SERUM INSTITUTE (2024-11-25)
-    (680749995, 9282479, 7, 'VACINA PENTA (DTP/HEPB/HIB)', 1,
-     '2024-11-25 08:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'PENTA24B', 7, 3, '2025-12-31 00:00:00', 4,
-     1, 0, 0, 2, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- Vacina meningo ACWY 1ª Dose — FIOCRUZ (2024-10-14)
-    (663571473, 9282479, 11, 'Vacina meningo ACWY', 1,
-     '2024-10-14 08:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'MENGOACWY24A', 11, 3, '2025-12-31 00:00:00', 6,
-     1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA ROTAVIRUS 1ª Dose — FIOCRUZ (2024-09-24)
-    (655145207, 9282479, 9, 'VACINA ROTAVIRUS', 1,
-     '2024-09-24 09:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'ROTA24A', 9, 3, '2025-12-31 00:00:00', 6,
-     1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3, 1, 1, 0, 0),
-    -- VACINA PNEUMO 10 1ª Dose — FIOCRUZ (2024-09-24)
-    (655144905, 9282479, 10, 'VACINA PNEUMO 10', 1,
-     '2024-09-24 09:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'PNEUMO24A', 10, 3, '2025-12-31 00:00:00', 6,
-     1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA PENTA (DTP/HEPB/HIB) 1ª Dose — PANACEA (2024-09-24)
-    (655144042, 9282479, 7, 'VACINA PENTA (DTP/HEPB/HIB)', 1,
-     '2024-09-24 09:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'PENTA24A', 6, 3, '2025-12-31 00:00:00', 6,
-     1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA POLIO INJETÁVEL 1ª Dose — FIOCRUZ (2024-09-24)
-    (655144614, 9282479, 6, 'VACINA POLIO INJETÁVEL', 1,
-     '2024-09-24 09:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'POLIO24A', 5, 3, '2025-12-31 00:00:00', 6,
-     1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    -- VACINA BCG Dose Única — SERUM INSTITUTE (2024-07-05)
-    (621443710, 9282479, 12, 'VACINA BCG', 1,
-     '2024-07-05 08:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'BCG24A', 12, 3, '2026-12-31 00:00:00', 7,
-     1, 0, 0, 5, 0, 0, 0, 1, 1, 0, 4, 1, 1, 0, 0),
-    -- VACINA HEPATITE B 2º Reforço — FUNDACAO BUTANTAN (2024-07-05)
-    (621443669, 9282479, 13, 'VACINA HEPATITE B', 1,
-     '2024-07-05 08:00:00', NOW(), 0, NULL,
-     NULL, NULL, 'HEPB24A', 13, 3, '2026-12-31 00:00:00', 7,
-     1, 0, 0, 8, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0);
-
--- 5. APLICAÇÕES (paciente 3033700 — Maria Eduarda Hummel Oliveira) --------
-
-INSERT INTO vac_aplicacao (
-    cd_vac_aplicacao, cd_usu_cadsus, cd_vacina, ds_vacina, cd_usuario,
-    dt_aplicacao, dt_cadastro, status, observacao,
-    cd_calendario, cd_estrategia, lote, cd_produto_vacina,
-    empresa, dt_validade, cd_profissional_aplicacao,
-    grupo_atendimento, flag_gestante, novo_frasco, cd_doses,
-    flag_historico, flag_puerpera, flag_fora_esquema_vacinal,
-    turno, local_atendimento, viajante,
-    cd_via_administracao, cd_local_aplicacao,
-    "version", comunicante_hanseniase, status_baixa
-) VALUES
-    (2001, 3033700, 4, 'HEPATITE B', 1,
-     '2020-03-01 08:00:00', NOW(), 0, NULL,
-     1, 1, 'HB001', NULL, 1, '2023-06-30 00:00:00', 1,
-     1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0),
-    (2002, 3033700, 5, 'TETANO', 1,
-     '2021-07-15 09:00:00', NOW(), 0, NULL,
-     1, 1, 'TET2021', NULL, 2, '2026-12-31 00:00:00', 2,
-     1, 0, 0, 6, 0, 0, 0, 1, 2, 0, 1, 2, 1, 0, 0);
-
--- 6. RNDS INTEGRAÇÃO ------------------------------------------------------
-
-INSERT INTO rnds_integracao_vacina
-    (cd_rnds_integracao_vacina, cd_vac_aplicacao, uuid_rnds, uuid_origem, situacao, cd_usuario, dt_usuario, "version")
-VALUES
-    (1, 712879059, 'uuid-polio-3dose',    'origem-712879059', 1, 1, NOW(), 1),
-    (2, 712878831, 'uuid-penta-3dose',    'origem-712878831', 1, 1, NOW(), 1),
-    (3, 2001,      'uuid-hepb-maria',     'origem-2001',      1, 1, NOW(), 1);
-
--- 7. DADOS ADICIONAIS para paciente 5128061 (DORVALINA FERREIRA DA MOTA MOCK) -----
-
--- Cidade de Goiânia com código IBGE
-INSERT INTO cidade (cod_cid, descricao, cod_est) VALUES
-    (520870, 'GOIANIA', 1);
-
--- Endereço da paciente
-INSERT INTO endereco_usuario_cadsus
-    (cd_endereco, keyword, nm_logradouro, nm_comp_logradouro, nr_logradouro, cep, nm_bairro, cod_cid, cd_tipo_logradouro)
-VALUES
-    (7230414, 'K3', 'CV18', 'RESIDENCIAL CENTER VILLE', 'SN', '74905450', 'RESIDENCIAL CENTER VILLE', 520870, 81);
-
--- Paciente 5128061
-INSERT INTO usuario_cadsus (
-    cd_usu_cadsus, nm_usuario, sg_sexo, nm_mae, nm_pai, email, cpf, dt_nascimento,
-    cd_pais_nascimento, cd_raca, cd_etnia, nr_telefone, nr_telefone_2, apelido,
-    cod_cid_nascimento, cd_endereco
-) VALUES
-    (5128061, 'DORVALINA FERREIRA DA MOTA MOCK', 'F',
-     'FRANCISCA FERREIRA DA MOTA', NULL,
-     NULL, '96748257115', '1952-11-11',
-     1, 4, NULL, '62984061234', NULL, NULL, 520870, 7230414);
-
--- Empresa: Secretaria Municipal de Saúde
-INSERT INTO empresa (empresa, descricao, fantasia, cod_cid, "version", cnes, acesso_restrito, situacao_bloqueio) VALUES
-    (3, 'SECRETARIA MUNICIPAL DE SAUDE DE GOIANIA', 'SECRETARIA MUNICIPAL DE SAUDE', 520870, 1, '2337545', 0, 0);
-
--- Fabricante: Fundação Butantan
-INSERT INTO fabricante_medicamento (cd_fabricante, ds_fabricante, "version", cnpj) VALUES
-    (5, 'FUNDACAO BUTANTAN', 1, '60501293000176');
-
--- Produto de vacina Influenza (Fundação Butantan)
-INSERT INTO produtos (
-    cod_pro, cod_uni, cod_gru, cod_sub, descricao, cont_min,
-    usuario, dt_usuario, dt_cadastro, "version",
-    flag_permite_disp_mais, flag_emprestimo, flag_tratamento_prolongado_antibiotico,
-    flag_ativo, flag_disp_ped_lic, cd_fabricante, fabricante_esus
-) VALUES
-    ('VACFLU02', 1, 1, 2, 'VACINA INFLUENZA TRIVALENTE INJETAVEL', 'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 5, 'Fundacao Butantan');
-
-INSERT INTO produto_vacina (cd_produto_vacina, cod_pro, cd_vacina, qt_dose, "version") VALUES
-    (4, 'VACFLU02', 2, 1, 1);
-
--- Profissional aplicador
-INSERT INTO profissional (cd_profissional, nm_profissional, nr_registro, cd_cns, cd_con_classe, "version", version_all) VALUES
-    (3, 'ROSANGELA MENESES DE BARROS', 'COREN-GO 108291', '898001627080007', 2, 1, 3);
-
--- 8. APLICAÇÕES DE VACINA (paciente 5128061 — Dorvalina Ferreira da Mota MOCK) -----
-
-INSERT INTO vac_aplicacao (
-    cd_vac_aplicacao, cd_usu_cadsus, cd_vacina, ds_vacina, cd_usuario,
-    dt_aplicacao, dt_cadastro, status, observacao,
-    cd_calendario, cd_estrategia, lote, cd_produto_vacina,
-    empresa, dt_validade, cd_profissional_aplicacao,
-    grupo_atendimento, flag_gestante, novo_frasco, cd_doses,
-    flag_historico, flag_puerpera, flag_fora_esquema_vacinal,
-    turno, local_atendimento, viajante,
-    cd_via_administracao, cd_local_aplicacao,
-    "version", comunicante_hanseniase, status_baixa
-) VALUES
-    -- Influenza Dose Única (2025)
-    (747298245, 5128061, 2, 'VACINA INFLUENZA TRIVALENTE', 1,
-     '2025-04-24 09:00:00', NOW(), 0, NULL,
-     2, 2, 'FLU2025B', 4, 3, '2025-12-31 00:00:00', 3,
-     2, 0, 0, 5, 0, 0, 0, 1, 1, 0, 2, 1, 1, 0, 0),
-    -- Febre Amarela Dose Única (2007 — histórico)
-    (6948661, 5128061, 3, 'VACINA FEBRE AMARELA (ATENUADA)', 1,
-     '2007-05-28 10:00:00', NOW(), 0, NULL,
-     1, 1, 'FA2007X', 3, 3, '2012-05-28 00:00:00', 3,
-     1, 0, 0, 5, 1, 0, 0, 1, 1, 0, 2, 1, 1, 0, 0);
-
--- 9. LOOKUP DATA para vacinas de 9282479 (Thallya) -------------------------
-
-INSERT INTO fabricante_medicamento (cd_fabricante, ds_fabricante, "version", cnpj) VALUES
-    (6, 'FUNDACAO OSWALDO CRUZ - FIOCRUZ',       1, '33781055000135'),
-    (7, 'PANACEA BIOTEC LTDA',                    1, NULL),
-    (8, 'GLAXOSMITHKLINE VACCINES S.R.L',         1, NULL),
-    (9, 'SERUM INSTITUTE OF INDIA LTD. - S.INDIA',1, NULL);
-
-INSERT INTO tipo_vacina (cd_vacina, ds_vacina, cod_gru, cod_sub, "version", version_all) VALUES
-    ( 6, 'VACINA POLIO INJETÁVEL',       3, 1, 1,  6),
-    ( 7, 'VACINA PENTA (DTP/HEPB/HIB)', 3, 2, 1,  7),
-    ( 8, 'VACINA MENINGO C',             3, 3, 1,  8),
-    ( 9, 'VACINA ROTAVIRUS',             3, 4, 1,  9),
-    (10, 'VACINA PNEUMO 10',             3, 5, 1, 10),
-    (11, 'VACINA MENINGO ACWY',          3, 6, 1, 11),
-    (12, 'VACINA BCG',                   3, 7, 1, 12),
-    (13, 'VACINA HEPATITE B',            2, 3, 1, 13);
-
-INSERT INTO produtos (
-    cod_pro, cod_uni, cod_gru, cod_sub, descricao, cont_min,
-    usuario, dt_usuario, dt_cadastro, "version",
-    flag_permite_disp_mais, flag_emprestimo, flag_tratamento_prolongado_antibiotico,
-    flag_ativo, flag_disp_ped_lic, cd_fabricante, fabricante_esus
-) VALUES
-    ('VPOLIO_FIO',     1, 3, 1, 'VACINA POLIO INJETÁVEL (FIOCRUZ)',          'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 6, 'FIOCRUZ'),
-    ('VPENTA_PAN',     1, 3, 2, 'VACINA PENTA (PANACEA BIOTEC)',              'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 7, 'Panacea Biotec'),
-    ('VPENTA_SER',     1, 3, 2, 'VACINA PENTA (SERUM INSTITUTE)',             'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 9, 'Serum Institute'),
-    ('VMENGOC_GSK',    1, 3, 3, 'VACINA MENINGO C (GLAXOSMITHKLINE)',         'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 8, 'GlaxoSmithKline'),
-    ('VROTAV_FIO',     1, 3, 4, 'VACINA ROTAVIRUS (FIOCRUZ)',                 'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 6, 'FIOCRUZ'),
-    ('VPNEUMO_FIO',    1, 3, 5, 'VACINA PNEUMO 10 (FIOCRUZ)',                 'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 6, 'FIOCRUZ'),
-    ('VMENACWY_FIO', 1, 3, 6, 'VACINA MENINGO ACWY (FIOCRUZ)',              'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 6, 'FIOCRUZ'),
-    ('VBCG_SER',       1, 3, 7, 'VACINA BCG (SERUM INSTITUTE)',               'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 9, 'Serum Institute'),
-    ('VHEPB_BUT',      1, 2, 3, 'VACINA HEPATITE B (FUNDACAO BUTANTAN)',      'N', 1, CURRENT_DATE, CURRENT_DATE, 1, 'N', 0, 0, 1, 0, 5, 'Fundacao Butantan');
-
-INSERT INTO produto_vacina (cd_produto_vacina, cod_pro, cd_vacina, qt_dose, "version") VALUES
-    ( 5, 'VPOLIO_FIO',      6, 1, 1),
-    ( 6, 'VPENTA_PAN',      7, 1, 1),
-    ( 7, 'VPENTA_SER',      7, 1, 1),
-    ( 8, 'VMENGOC_GSK',     8, 1, 1),
-    ( 9, 'VROTAV_FIO',      9, 1, 1),
-    (10, 'VPNEUMO_FIO',    10, 1, 1),
-    (11, 'VMENACWY_FIO', 11, 1, 1),
-    (12, 'VBCG_SER',       12, 1, 1),
-    (13, 'VHEPB_BUT',      13, 1, 1);
-
-INSERT INTO profissional (cd_profissional, nm_profissional, nr_registro, cd_cns, cd_con_classe, "version", version_all) VALUES
-    (4, 'ADRIANA BORGES RIBEIRO CARRIJO',  'COREN-GO 7742',  NULL, 2, 1, 4),
-    (5, 'MARIA GEOVANIA DA SILVA CONCEICAO','COREN-GO 841432', NULL, 2, 1, 5),
-    (6, 'MARIA ANITA RODRIGUES DOS SANTOS', 'COREN-GO 551858', NULL, 2, 1, 6),
-    (7, 'KELLY MARIA DE PAULA SOBRINHO',    'COREN-GO 099551', NULL, 2, 1, 7);
-
--- 10. PRONTUÁRIO — tabelas de referência e atendimentos (paciente 9282479) ---
-
--- Unidades de saúde (empresas 4-9)
-INSERT INTO empresa (empresa, descricao, fantasia, cod_cid, "version", cnes, acesso_restrito, situacao_bloqueio, telefone) VALUES
-    (4, 'USF BRISAS DA MATA',                                     'USF BRISAS DA MATA',         520870, 1, '7018977', 0, 0, '06235243006'),
-    (5, 'UPA MARIA PIRES PERILLO - UPA NOROESTE',                 'UPA NOROESTE',               520870, 1, '3624969', 0, 0, '6235243461'),
-    (6, 'UPA - FINSOCIAL',                                        'UPA FINSOCIAL',              520870, 1, '5604591', 0, 0, '6235243533'),
-    (7, 'CENTRO DE SAUDE NORTE FERROVIARIO',                      'CS NORTE FERROVIARIO',       520870, 1, '2337731', 0, 0, '6235241921'),
-    (8, 'CENTRO DE SAUDE SETOR PERIM BENEDITO DOS SANTOS VIEIRA', 'CS SETOR PERIM',             520870, 1, '2337820', 0, 0, NULL),
-    (9, 'USF ALTO DO VALE',                                       'USF ALTO DO VALE',           520870, 1, '5539490', 0, 0, '6235243503');
-
--- CBO (Classificação Brasileira de Ocupações)
 INSERT INTO tabela_cbo (cd_cbo, ds_cbo) VALUES
-    ('322250', 'AUXILIAR DE ENFERMAGEM DA ESTRATEGIA DE SAUDE DA FAMILIA'),
-    ('223505', 'Enfermeiro'),
-    ('322245', 'TECNICO DE ENFERMAGEM DA ESTRATEGIA DE SAUDE DA FAMILIA'),
-    ('223565', 'ENFERMEIRO DA ESTRATEGIA DE SAUDE DA FAMILIA'),
-    ('225124', 'MEDICO PEDIATRA'),
-    ('322205', 'Técnico de enfermagem'),
-    ('225142', 'MEDICO DA ESTRATEGIA DE SAUDE DA FAMILIA'),
-    ('225125', 'MEDICO CLINICO');
+    ('225125', 'MEDICO CLINICO'),
+    ('225170', 'MEDICO PSIQUIATRA'),
+    ('223505', 'ENFERMEIRO'),
+    ('251510', 'PSICOLOGO CLINICO'),
+    ('322205', 'TECNICO DE ENFERMAGEM');
 
--- Classificação de risco
 INSERT INTO classificacao_risco (cd_classificacao_risco, descricao) VALUES
     (1, 'Não Urgente'),
     (2, 'Pouco Urgente'),
@@ -702,206 +648,280 @@ INSERT INTO classificacao_risco (cd_classificacao_risco, descricao) VALUES
     (4, 'Muito Urgente'),
     (5, 'Emergência');
 
--- Tipos de atendimento
 INSERT INTO tipo_atendimento (cd_tp_atendimento, ds_tipo_atendimento) VALUES
-    ( 1, 'APS - CONSULTA DE ENFERMAGEM'),
-    ( 2, 'APS - CONSULTA MÉDICA'),
-    ( 3, 'USF - ACOLHIMENTO À DEMANDA ESPONTÂNEA'),
-    ( 4, 'UPA - CLASSIFICAÇÃO DE RISCO'),
-    ( 5, 'UPA - ATENDIMENTO INFANTIL'),
-    ( 6, 'UPA - OBSERVAÇÃO - INFANTIL'),
-    ( 7, 'APS - ACOMPANHAMENTO BENEFICIÁRIO BOLSA FAMILIA'),
-    ( 8, 'APS - VACINA'),
-    ( 9, 'APS - ACOLHIMENTO'),
-    (10, 'APS - CONSULTA PEDIATRIA'),
-    (11, 'APS - SALA DE PROCEDIMENTOS'),
-    (12, 'APS - ACOLHIMENTO À DEMANDA ESPONTÂNEA');
+    (1, 'APS - CONSULTA DE ENFERMAGEM'),
+    (2, 'APS - CONSULTA MÉDICA'),
+    (3, 'CAPS - ACOLHIMENTO PSICOSSOCIAL'),
+    (4, 'CAPS - ATENDIMENTO INDIVIDUAL'),
+    (5, 'CAPS - ATENDIMENTO EM GRUPO');
 
--- Natureza/Tipo de atendimento (1:1 mapeamento)
 INSERT INTO natureza_procura_tp_atendimento (cd_nat_proc_tp_atendimento, cd_tp_atendimento) VALUES
-    ( 1,  1),( 2,  2),( 3,  3),( 4,  4),( 5,  5),( 6,  6),
-    ( 7,  7),( 8,  8),( 9,  9),(10, 10),(11, 11),(12, 12);
+    (1, 1), (2, 2), (3, 3), (4, 4), (5, 5);
 
--- Profissionais dos atendimentos (8-19)
-INSERT INTO profissional (cd_profissional, nm_profissional, nr_registro, cd_cns, cd_con_classe, "version", version_all) VALUES
-    ( 8, 'DIANA FERREIRA DE SOUZA',              'COREN-GO 622698',  NULL, 2, 1,  8),
-    ( 9, 'LUIS FELIPE PIRES FONTANA',             'CRM-GO 28160',     NULL, 1, 1,  9),
-    (10, 'SELOMITE BERNARDES DE MORAES',          'COREN-GO 178992',  NULL, 2, 1, 10),
-    (11, 'MARLON HORA MARTINS',                   'CRM-GO 35135',     NULL, 1, 1, 11),
-    (12, 'ERIKA KAREM GOMES DA SILVA ARAUJO',     'COREN-GO 214785',  NULL, 2, 1, 12),
-    (13, 'MARIA APARECIDA DE LIMA',               'COREN-GO 165805',  NULL, 2, 1, 13),
-    (14, 'EDNA PEREIRA DOS SANTOS',               'COREN-GO 758895',  NULL, 2, 1, 14),
-    (15, 'JAMES NOGUEIRA PIMENTA',                'CRM-GO 10062',     NULL, 1, 1, 15),
-    (16, 'ANA CAROLINA MATIAS FERREIRA',          'CRM-GO 27907',     NULL, 1, 1, 16),
-    (17, 'ISABEL MADALENA DE SOUZA TRINDADE',     'COREN-GO 115701',  NULL, 2, 1, 17),
-    (18, 'LUCIA GONCALVES DA SILVA',              'COREN-GO 267171',  NULL, 2, 1, 18),
-    (19, 'RODRIGO CAETANO DE ALMEIDA',            'CRM-GO 6445',      NULL, 1, 1, 19);
+-- Empresas (CAPS — unidades prestadoras de serviço psicossocial)
+INSERT INTO empresa (empresa, descricao, fantasia, cod_cid, "version", cnes, acesso_restrito, situacao_bloqueio, telefone) VALUES
+    (1001, 'CAPS AD3 NOROESTE',                 'CAPS AD3 NOROESTE',     520870, 1, '7018977', 0, 0, '6235243006'),
+    (1002, 'CAPS II SUL',                       'CAPS II SUL',           520870, 1, '3624969', 0, 0, '6235243461'),
+    (1003, 'CAPS INFANTO JUVENIL LESTE',        'CAPS IJ LESTE',         520870, 1, '5604591', 0, 0, '6235243533'),
+    (1004, 'CAPS AD III NOVO MUNDO',            'CAPS AD III NM',        520870, 1, '2337731', 0, 0, '6235241921'),
+    (1005, 'SECRETARIA MUNICIPAL DE SAUDE',     'SMS GOIANIA',           520870, 1, '2337545', 0, 0, '6235241000');
 
--- Atendimentos do paciente 9282479 (34 registros)
-INSERT INTO atendimento
-    (nr_atendimento, cd_usu_cadsus, empresa, cd_profissional, cd_cbo,
-     classificacao_risco, cd_nat_proc_tp_atendimento,
-     dt_chegada, dt_atendimento, status)
-VALUES
-    (102064248, 9282479,  4, NULL,  NULL, 1,  1, '2025-04-24 10:37:53', '2025-04-24 11:30:00', 5),
-    (101951432, 9282479,  4, NULL,  NULL, 1,  2, '2025-04-23 11:44:33', '2025-04-23 12:30:00', 5),
-    (101949229, 9282479,  4,    5, '322250', 1, 3, '2025-04-23 11:44:33', '2025-04-23 12:00:00', 5),
-    (101677656, 9282479,  5,    8, '223505', 2, 4, '2025-04-20 07:12:54', '2025-04-20 08:00:00', 5),
-    (101678211, 9282479,  5,    9, '225124', 2, 5, '2025-04-20 07:12:54', '2025-04-20 08:30:00', 5),
-    (101678612, 9282479,  5,    9, '225124', 2, 6, '2025-04-20 07:12:54', '2025-04-20 09:00:00', 5),
-    (101679191, 9282479,  5, NULL,  NULL,    2, 6, '2025-04-20 07:12:54', '2025-04-20 09:30:00', 5),
-    (101620758, 9282479,  6,   10, '223505', 2, 4, '2025-04-18 18:17:29', '2025-04-18 18:30:00', 5),
-    (101620969, 9282479,  6,   11, '225125', 2, 5, '2025-04-18 18:17:29', '2025-04-18 19:00:00', 5),
-    (101621788, 9282479,  6, NULL,  NULL,    2, 6, '2025-04-18 18:17:29', '2025-04-18 19:30:00', 5),
-    ( 99418682, 9282479,  6,   12, '223505', 2, 4, '2025-03-24 19:05:40', '2025-03-24 19:45:00', 5),
-    ( 99420002, 9282479,  6,    9, '225125', 2, 5, '2025-03-24 19:05:40', '2025-03-24 20:10:00', 5),
-    ( 99422704, 9282479,  6, NULL,  NULL,    2, 6, '2025-03-24 19:05:40', '2025-03-24 20:30:00', 5),
-    ( 97062779, 9282479,  4,   13, '223565', 1, 1, '2025-02-24 11:38:22', '2025-02-24 12:00:00', 5),
-    ( 96196958, 9282479,  4,    5, '322250', 1, 3, '2025-02-14 08:46:39', '2025-02-14 09:00:00', 5),
-    ( 96196827, 9282479,  4,   13, '223565', 1, 7, '2025-02-14 08:46:04', '2025-02-14 09:10:00', 5),
-    ( 96199390, 9282479,  4,   13, '223565', 1, 1, '2025-02-14 08:46:04', '2025-02-14 09:15:00', 5),
-    ( 95767176, 9282479,  4,    4, '322250', 1, 8, '2025-02-10 09:03:01', '2025-02-10 09:30:00', 5),
-    ( 93071882, 9282479,  4,    5, '322250', 1, 8, '2025-01-06 10:05:28', '2025-01-06 10:30:00', 5),
-    ( 92150306, 9282479,  7,   14, '322205', 1,12, '2024-12-18 10:03:01', '2024-12-18 10:30:00', 5),
-    ( 92151575, 9282479,  7,   15, '225124', 1,10, '2024-12-18 10:03:01', '2024-12-18 11:10:00', 5),
-    ( 90538985, 9282479,  4,   13, '223565', 1, 7, '2024-11-27 16:04:28', '2024-11-27 16:40:00', 5),
-    ( 90538878, 9282479,  4,    6, '322245', 1, 3, '2024-11-27 16:03:34', '2024-11-27 16:15:00', 5),
-    ( 90239238, 9282479,  4,    6, '322245', 1, 8, '2024-11-25 08:36:00', '2024-11-25 09:00:00', 5),
-    ( 87179588, 9282479,  4,    6, '322245', 1, 8, '2024-10-14 08:36:44', '2024-10-14 09:00:00', 5),
-    ( 85760814, 9282479,  4,    6, '322245', 1, 8, '2024-09-24 09:08:50', '2024-09-24 09:30:00', 5),
-    ( 85327309, 9282479,  8,   18, '322205', 1, 9, '2024-09-18 08:59:53', '2024-09-18 09:30:00', 5),
-    ( 85332152, 9282479,  8,   19, '225124', 1,10, '2024-09-18 08:59:53', '2024-09-18 09:50:00', 5),
-    ( 84578785, 9282479,  4,    6, '322245', 1, 3, '2024-09-09 08:53:13', '2024-09-09 09:00:00', 5),
-    ( 84579670, 9282479,  4,   16, '225142', 1, 2, '2024-09-09 08:53:13', '2024-09-09 09:20:00', 5),
-    ( 81793688, 9282479,  4,   13, '223565', 1, 1, '2024-08-05 08:46:01', '2024-08-05 09:15:00', 5),
-    ( 79845193, 9282479,  4,    4, '322245', 1, 3, '2024-07-08 10:43:08', '2024-07-08 10:50:00', 5),
-    ( 79845999, 9282479,  4,   16, '225142', 1, 2, '2024-07-08 10:43:08', '2024-07-08 11:35:00', 5),
-    ( 79614642, 9282479,  9,   17, '322250', 1,11, '2024-07-04 10:26:27', '2024-07-04 13:05:00', 5);
+-- Atendimentos e prontuário (mínimo para os scripts legados continuarem coerentes)
+INSERT INTO atendimento (nr_atendimento, cd_usu_cadsus, empresa, cd_profissional, cd_cbo, classificacao_risco, cd_nat_proc_tp_atendimento, dt_chegada, dt_atendimento, status) VALUES
+    (500001, 9282479, 1001, 3, '251510', 1, 3, '2025-12-02 08:00:00', '2025-12-02 08:30:00', 5),
+    (500002, 5128061, 1002, 4, '225170', 1, 4, '2025-12-04 09:00:00', '2025-12-04 09:30:00', 5);
 
--- Registros dos atendimentos (atendimento_prontuario)
 INSERT INTO atendimento_prontuario (id, nr_atendimento, data, tipo_registro, descricao) VALUES
-    -- 101677656 — UPA NOROESTE Classificação de Risco
-    (1, 101677656, '2025-04-20 07:44:55.977', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Motivo Consulta: </b>PACIENTE ACOMPANHADA PELO PAIS PACIENTE RESPONSAVEL AFIRMA QUE HA 03 DIAS A PACIENTE INICIOU COM CHORO PERSISTENTE, 1 EPISODIO FEBRE 38,5C, AFIRMA DIARREIA 04 EPISODIOS SEM SANGUE, DIUSERE CONCENTRADA HA 2 DIAS, NAUSEAS, NEGA VOMITOS, GEMENTE, <b>Classificação de Risco: </b>Pouco Urgente, </p></body></html>'),
-    -- 101678211 — UPA NOROESTE Atendimento Infantil Evolução
-    (2, 101678211, '2025-04-20 07:54:41.517', 2,
-     '<p>JA TEM UNS DIAS QUE TAVA MEIO RUIM, DEPOIS QUE SAROU FICOU GEMENDO TODA HORA. - USO DE CEFALEXINA E ATB TOPICO.</p><p>&nbsp;</p><p>ABDOME RIGIDO, CRIANCA GEMENTE, SEM ALTERACAO DE RIGIDEZ OU DE CHORO A PALPACAO.</p><p>&nbsp;</p><p>HD - DISBIOSE POS ATB.</p><p>&nbsp;</p><p>SOLICITO RADIOGRAFIA</p>'),
-    -- 101678612 — UPA NOROESTE Observação Evolução
-    (3, 101678612, '2025-04-20 08:18:47.601', 2,
-     '<p>RX - DISTENCAO ABDOMINAL EM PONTOS ESPECIFICOS</p><p>&nbsp;</p><p>FLORA B + PREDNISOLONA</p><p>INICI</p>'),
-    -- 101620758 — UPA FINSOCIAL Classificação de Risco Avaliação
-    (4, 101620758, '2025-04-18 18:20:19.497', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Motivo Consulta: </b>MAE REFERE CRIANCA COM CHORO PERSISTENTE, DIARREIA LIQUIDA, FEBRE (ONTEM), NEGA ALERGIA A MEDICAMENTOS, COMORBIDADE. NO MOMENTO AFEBRIL, <b>Classificação de Risco: </b>Pouco Urgente, </p></body></html>'),
-    -- 101620969 — UPA FINSOCIAL Atendimento Infantil Evolução
-    (5, 101620969, '2025-04-18 18:34:18.976', 2,
-     '<p># PESO: 8 KG</p><p>&nbsp;</p><p># HDA: PACIENTE COMPARECE ACOMPANHADA DA MAE, NAYANNE. RESPONSAVEL AFIRMA QUE HA 01 DIA A PACIENTE INICIOU COM CHORO PERSISTENTE E TEVE 01 EPISODIO DE FEBRE 38,5C. ALEM DISSO, AFIRMA DIARREIA 04 EPISODIOS SEM SANGUE E SEM MUCO COM INICIO HA 01 DIA. NEGA NAUSEAS, VOMITOS.</p><p>&nbsp;</p><p># HPP: NEGA COMORBIDADES / NEGA ALERGIAS.</p><p>&nbsp;</p><p># AO EXAME FISICO: BEG, AAA, CORADA E HIDRATADA / ATIVA, REATIVA E CONTACTUANTE / ABDOME: FLACIDO, NORMOTENSO, INDOLOR A PALPACAO.</p><p>&nbsp;</p><p># HD: FEBRE A/E??</p><p>&nbsp;</p><p># CD: SOLICITO HMG E EAS. REAVALIAR APOS RESULTADO.</p>'),
-    -- 101620969 — UPA FINSOCIAL Exame solicitado
-    (6, 101620969, '2025-04-18 18:48:38.823', 6,
-     '<b><u>Exames Solicitados - UPA - EXAMES LABORATORIAIS DE URGENCIA / </b></u><br />URG - ANALISE DE CARACTERES FISICOS, ELEMENTOS E SEDIMENTO DA URINA (EAS)<br />URG - HEMOGRAMA COMPLETO'),
-    -- 99418682 — UPA FINSOCIAL Classificação de Risco Avaliação
-    (7, 99418682, '2025-03-24 19:31:02.434', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Motivo Consulta: </b>Mae Naiane, <b>Classificação de Risco: </b>Pouco Urgente, <b>Historico: </b>Mae relata secrecao no ouvido esquerdo, incio a aprox. 3 semanas. Em uso de pomada de neomicina e anti alergico desloratadina, sem melhora. Nega ou desconhece alergias. Nega comorbidade. Peso aprox. 8200 kg, </p></body></html>'),
-    -- 99420002 — UPA FINSOCIAL Atendimento Infantil Evolução
-    (8, 99420002, '2025-03-24 19:58:22.883', 2,
-     '<p>VISUALIZACAO DIFICIL</p><p>HD - OTITE EXTERNA</p><p>&nbsp;</p><p>CEFALEXINA + OTOCIRIAX</p>'),
-    -- 97062779 — USF BRISAS Consulta Enfermagem Evolução
-    (9, 97062779, '2025-02-24 11:40:55.606', 2,
-     '<p>Paciente não compareceu a consulta agendada para hoje</p>'),
-    -- 97062779 — USF BRISAS Consulta Enfermagem Avaliação
-    (10, 97062779, '2025-02-24 11:42:22.939', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>7,500, <b>Altura (cm): </b>63.0, <b>Classificação de Risco: </b>Não Urgente, </p></body></html>'),
-    -- 96196958 — USF BRISAS Acolhimento Avaliação
-    (11, 96196958, '2025-02-14 08:54:00', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>7,500, <b>Altura (cm): </b>63.0, <b>Classificação de Risco: </b>Não Urgente, </p></body></html>'),
-    -- 96196827 — USF BRISAS Bolsa Familia Avaliação
-    (12, 96196827, '2025-02-14 08:55:56.53', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>7,500, <b>Altura (cm): </b>63.0, <b>Classificação de Risco: </b>Não Urgente, <b>Observacao: </b>Acompanhamento bolsa familia, </p></body></html>'),
-    -- 96199390 — USF BRISAS Consulta Enfermagem Evolução
-    (13, 96199390, '2025-02-14 09:08:37.732', 2,
-     '<p>Acompanhamento do bolsa familia</p>'),
-    -- 92150306 — CS NORTE FERROVIARIO Acolhimento Avaliação
-    (14, 92150306, '2024-12-18 10:07:30.965', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>7,500, <b>Altura (cm): </b>63.0, <b>Classificação de Risco: </b>Não Urgente, </p></body></html>'),
-    -- 92150306 — CS NORTE FERROVIARIO Acolhimento Evolução
-    (15, 92150306, '2024-12-18 10:09:45.21', 2,
-     '<p>Realizado triagem para consulta</p><p>PESO .7,500</p><p>ESTATURA .63</p><p>Cd encaminhado a consulta medica</p>'),
-    -- 92151575 — CS NORTE FERROVIARIO Consulta Pediatria Evolução
-    (16, 92151575, '2024-12-18 11:01:46.631', 2,
-     '<p>Puericultura</p><p>Corado, hidratado, acianotico, anicterico, eupneico afebril, TEC menor que 3 segundos</p><p>RCR 2t BNF sem sopro ou extrassistoles</p><p>Mvau sem ra sem esforco</p><p>Abdome flacido Rh + ausencia de vcm ou massas palpaveis</p><p>MMiis sem alteracoes</p><p>&nbsp;</p><p>cd: orientacoes, vit d neutrofer</p>'),
-    -- 90538985 — USF BRISAS Bolsa Familia Avaliação
-    (17, 90538985, '2024-11-27 16:29:10.373', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>7,600, <b>Altura (cm): </b>59.0, <b>Classificação de Risco: </b>Não Urgente, <b>Observacao: </b>Acompanhamento do bolsa familia, </p></body></html>'),
-    -- 90538878 — USF BRISAS Acolhimento Avaliação
-    (18, 90538878, '2024-11-27 16:07:00', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>7,600, <b>Classificação de Risco: </b>Não Urgente, </p></body></html>'),
-    -- 85327309 — CS SETOR PERIM Acolhimento Avaliação
-    (19, 85327309, '2024-09-18 09:24:02.105', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>5,270, <b>Altura (cm): </b>56.5, <b>Perimetro Cefalico (cm): </b>39,00, <b>Classificação de Risco: </b>Não Urgente, </p></body></html>'),
-    -- 85327309 — CS SETOR PERIM Acolhimento Evolução
-    (20, 85327309, '2024-09-18 09:24:48.074', 2,
-     '<p>Aguardando consulta medica</p>'),
-    -- 85332152 — CS SETOR PERIM Consulta Pediatria Evolução
-    (21, 85332152, '2024-09-18 09:44:09.984', 2,
-     '<p>rotina sem queixas suga bem eliminacoes ok gripadinha</p><p>vacina ok</p><p>lme /vit d</p><p>ao xame : sem alt</p><p>cd: orientacoes</p>'),
-    -- 84578785 — USF BRISAS Acolhimento Avaliação
-    (22, 84578785, '2024-09-09 08:57:00', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>5,500, <b>Classificação de Risco: </b>Não Urgente, </p></body></html>'),
-    -- 84579670 — USF BRISAS Consulta Médica Evolução
-    (23, 84579670, '2024-09-09 09:18:16.849', 2,
-     '<p>Q.P.: "CONSULTA DE ROTINA"</p><p>HDA: PACIENTE ACOMPANHADA PELA MAE, COMPARECE PARA CONSULTA DE CRESCIMENTO E DESENVOLVIMENTO. NEGA QUEIXAS NO MOMENTO.</p><p>EXAME FISICO: BOM ESTADO GERAL, NORMOCORADA, HIDRATADA<br />FONTANELAS NORMOTENSAS<br />DESENVOLVIMENTO NEUROPSICOMOTOR ADEQUADO PARA IDADE</p><p>TESTES DE TRIAGEM NEONATAL SEM ALTERACOES REALIZADO DIA 12/07/2024</p><p>CD: MANTENHO MEDICAMENTOS / ENCAMINHO AO PEDIATRA (TESTE DO OLHINHO)</p>'),
-    -- 81793688 — USF BRISAS Consulta Enfermagem Evolução
-    (24, 81793688, '2024-08-05 09:12:23.904', 2,
-     '<p>MAE TRAX LACTENTE PARA CONSULTA DE CD</p><p>MAE NEGA PATOLOGIAS INFECTOCONTAGIOSAS TRIADAS NO PRE NATAL</p><p>NASCIDO DE PARTO NORMAL / APGAR 1 9 2 9 / PC 34 CM PT 32 CM IG 38 s e 4 dias</p><p>TESTES DE TRIAGEM NEONATAL SEM ALTERACOES REALIZADO DIA 12/07/2024</p><p>Mae traz crianca para consulta de cd. nega queixas no momento / Alimentacao: LM exclusivo</p><p>PCT 37 cm / peso 4200 / est 54 cm</p><p>BOM ESTADO GERAL, NORMOCORADA, HIDRATADA</p><p>lactente com crescimento e desenvolvimento adequado para idade e sexo</p><p>conduta: orientacao</p>'),
-    -- 79845193 — USF BRISAS Acolhimento Avaliação
-    (25, 79845193, '2024-07-08 10:47:00', 1,
-     '<html><head></head><body><p style="margin-bottom: 0.0; margin-top: 0"><b>Peso (Kg): </b>3,200, <b>Classificação de Risco: </b>Não Urgente, </p></body></html>'),
-    -- 79845999 — USF BRISAS Consulta Médica Evolução
-    (26, 79845999, '2024-07-08 11:29:07.929', 2,
-     '<p>Q.P.: "CONSULTA DE ROTINA"</p><p>HDA: PACIENTE ACOMPANHADA PELA MAE, QUE COMPARECE PARA CONSULTA DE PUERICULTURA. NEGA QUEIXAS NO MOMENTO.</p><p>EXAME FISICO: PC: 36CM / PESO: 3,2G / COMP: 45CM</p><p>BOM ESTADO GERAL, NORMOCORADA, HIDRATADA</p><p>TESTES DE TRIAGEM NEONATAL SEM ALTERACOES</p><p>CD: 1) VITAMINA D 200UI: 2GOTAS/DIA ATE OS 2 ANOS / 2) GROW FERRO 5MG: 1 GOTA/DIA ATE OS 2 ANOS / AGUARDO RESULTADO DE TESTE DO PEZINHO / RETORNO MENSAL</p>'),
-    -- 79614642 — USF ALTO DO VALE Sala Procedimentos
-    (27, 79614642, '2024-07-04 13:01:18.387', 2,
-     '<p>coleta teste do pezinho</p>');
+    (1, 500001, '2025-12-02 08:30:00', 1, 'Acolhimento psicossocial inicial — paciente em uso de SPA.'),
+    (2, 500002, '2025-12-04 09:30:00', 2, 'Atendimento individual de seguimento. Estável.');
 
+-- ============================================================================
+-- 9. INSERTS — DADOS NÚCLEO RAAS PSICOSSOCIAL
+--    (objeto principal dos testes desta aplicação)
+-- ============================================================================
 
--- ==========================================================================
--- RAAS PSI — Tabela e dados de teste
--- ==========================================================================
+-- 9.1 Cabeçalhos RAAS — duas competências para testar o endpoint de geração
+INSERT INTO raas (
+    cd_raas, linha, indicador_inicio, competencia, quantidade_folhas, campo_controle,
+    nm_orgao_origem, sigla_orgao_origem, cgc_prestador,
+    nm_orgao_destino, indicador_orgao_destino,
+    dt_geracao, versao, versao_bdsia, status, empresa
+) VALUES
+    (1, 1, '01', '2025-12-01', 1, 100001,
+     'FATURAMENTO SMS', 'GCPAH', 25141524000123,
+     'SECRETARIA MUN DE SAUDE DE GOIANIA', 'M',
+     '2025-12-31', '1.0', '202512a', 1, 1001),
+    (2, 1, '01', '2026-01-01', 1, 100002,
+     'FATURAMENTO SMS', 'GCPAH', 25141524000123,
+     'SECRETARIA MUN DE SAUDE DE GOIANIA', 'M',
+     '2026-01-31', '1.0', '202601a', 1, 1001);
 
-CREATE TABLE raas_psi (
-    id                          BIGSERIAL    PRIMARY KEY,
-    competencia                 DATE         NOT NULL,
-    co_unidade                  BIGINT,
-    unidade_prestadora_servico  VARCHAR(200) NOT NULL,
-    cns_paciente                VARCHAR(15),
-    nome_paciente               VARCHAR(200),
-    cns_profissional            VARCHAR(15),
-    cbo_profissional            VARCHAR(10),
-    cid_principal               VARCHAR(10),
-    procedimento_principal      VARCHAR(10),
-    dt_cadastro                 TIMESTAMP    NOT NULL DEFAULT NOW()
-);
+-- 9.2 Pacientes RAAS PSI — 5 pacientes na competência 12/2025, 3 em 01/2026
+INSERT INTO raas_psi (
+    cd_raas_psi, cd_raas, linha, unidade_federacao, competencia, unidade_prestadora_servico,
+    cartao_nacional_saude, dt_inicio_validade, dt_final_validade,
+    nm_paciente, numero_prontuario, nm_mae,
+    logradouro, numero_logradouro, complemento_logradouro, cep, municipio,
+    dt_nascimento, sexo, raca, nm_responsavel, nacionalidade, etnia,
+    telefone, celular, motivo_saida_permanencia, dt_ocorrencia,
+    cid_principal, cid_secundario_1, cid_secundario_2, cid_secundario_3, cid_causas_associadas,
+    carater_atendimento, origem_paciente, cobertura_esf, codigo_cobertura_esf,
+    total_procedimentos, destino_paciente, origem_informacoes,
+    situacao_rua, usuario_drogas, tipo_droga_alcool, tipo_droga_crack, tipo_droga_outros,
+    numero_autorizacao, descricao_bairro, tipo_logradouro, email_paciente, cpf_paciente
+) VALUES
+    -- Competência 2025-12 (5 pacientes)
+    (101, 1, 1, 52, '2025-12-01', 7018977, '700000000000001', '2025-12-01', '2025-12-31',
+     'PACIENTE TESTE UM',                    1001, 'MARIA TESTE UM',
+     'RUA C 149',           'SN',   'QD 325 LT 11',         '74230050', 520870,
+     '1985-04-12', 'M', 1, NULL, 10, 0, '6232110001', '62991630001', 0, '2025-12-15',
+     'F19.2', NULL, NULL, NULL, NULL,
+     1, 1, 'S', 7018977, 3, 1, 'BPA',
+     'N', 'S', 'S', 'N', 'N',
+     202512000001, 'JARDIM AMERICA', 81, 'paciente1@email.com', '00000000001'),
+    (102, 1, 2, 52, '2025-12-01', 7018977, '700000000000002', '2025-12-01', '2025-12-31',
+     'PACIENTE TESTE DOIS',                  1002, 'MARIA TESTE DOIS',
+     'AVENIDA GOIAS',       '1500', NULL,                    '74000100', 520870,
+     '1990-07-22', 'F', 4, NULL, 10, 0, '6232110002', '62991630002', 0, '2025-12-15',
+     'F20.0', 'F25.1', NULL, NULL, NULL,
+     2, 1, 'S', 7018977, 4, 1, 'BPA',
+     'N', 'N', 'N', 'N', 'N',
+     202512000002, 'CENTRO', 82, 'paciente2@email.com', '00000000002'),
+    (103, 1, 3, 52, '2025-12-01', 5604591, '700000000000003', '2025-12-01', '2025-12-31',
+     'PACIENTE INFANTIL TRES',                1003, 'MARIA TESTE TRES',
+     'RUA CV18',            'SN',   'RESIDENCIAL CENTER',    '74905450', 520870,
+     '2012-03-08', 'M', 4, 'JOAO RESPONSAVEL', 10, 0, '6232110003', '62991630003', 0, '2025-12-15',
+     'F90.0', NULL, NULL, NULL, NULL,
+     1, 1, 'S', 5604591, 2, 1, 'BPA',
+     'N', 'N', 'N', 'N', 'N',
+     202512000003, 'CENTER VILLE', 81, NULL, '00000000003'),
+    (104, 1, 4, 52, '2025-12-01', 3624969, '700000000000004', '2025-12-01', '2025-12-31',
+     'PACIENTE TESTE QUATRO',                 1004, 'MARIA TESTE QUATRO',
+     'RUA RB 51 A',         'SN',   'QD 51 LT 72',           '74474396', 520870,
+     '1978-11-30', 'F', 2, NULL, 10, 0, '6232110004', '62991630004', 0, '2025-12-15',
+     'F31.0', NULL, NULL, NULL, NULL,
+     1, 1, 'N', NULL, 5, 1, 'BPA',
+     'N', 'N', 'N', 'N', 'N',
+     202512000004, 'RECANTO DO BOSQUE', 81, 'paciente4@email.com', '00000000004'),
+    (105, 1, 5, 52, '2025-12-01', 7018977, '700000000000005', '2025-12-01', '2025-12-31',
+     'PACIENTE TESTE CINCO',                  1005, 'MARIA TESTE CINCO',
+     'AVENIDA GOIAS',       '1500', NULL,                    '74000100', 520870,
+     '1965-02-18', 'M', 1, NULL, 10, 0, '6232110005', '62991630005', 0, '2025-12-15',
+     'F10.2', 'F19.2', NULL, NULL, NULL,
+     2, 2, 'S', 7018977, 6, 1, 'BPA',
+     'S', 'S', 'S', 'S', 'N',
+     202512000005, 'CENTRO', 82, NULL, '00000000005'),
+    -- Competência 2026-01 (3 pacientes)
+    (201, 2, 1, 52, '2026-01-01', 7018977, '700000000000001', '2026-01-01', '2026-01-31',
+     'PACIENTE TESTE UM',                     1001, 'MARIA TESTE UM',
+     'RUA C 149',           'SN',   'QD 325 LT 11',         '74230050', 520870,
+     '1985-04-12', 'M', 1, NULL, 10, 0, '6232110001', '62991630001', 0, '2026-01-20',
+     'F19.2', NULL, NULL, NULL, NULL,
+     1, 1, 'S', 7018977, 3, 1, 'BPA',
+     'N', 'S', 'S', 'N', 'N',
+     202601000001, 'JARDIM AMERICA', 81, 'paciente1@email.com', '00000000001'),
+    (202, 2, 2, 52, '2026-01-01', 3624969, '700000000000004', '2026-01-01', '2026-01-31',
+     'PACIENTE TESTE QUATRO',                 1004, 'MARIA TESTE QUATRO',
+     'RUA RB 51 A',         'SN',   'QD 51 LT 72',           '74474396', 520870,
+     '1978-11-30', 'F', 2, NULL, 10, 0, '6232110004', '62991630004', 0, '2026-01-20',
+     'F31.0', NULL, NULL, NULL, NULL,
+     1, 1, 'N', NULL, 4, 1, 'BPA',
+     'N', 'N', 'N', 'N', 'N',
+     202601000002, 'RECANTO DO BOSQUE', 81, 'paciente4@email.com', '00000000004'),
+    (203, 2, 3, 52, '2026-01-01', 5604591, '700000000000006', '2026-01-01', '2026-01-31',
+     'PACIENTE INFANTIL SEIS',                1006, 'MARIA TESTE SEIS',
+     'AVENIDA GOIAS',       '700',  NULL,                    '74000100', 520870,
+     '2010-09-14', 'F', 4, 'PEDRO RESPONSAVEL', 10, 0, '6232110006', '62991630006', 0, '2026-01-20',
+     'F84.0', NULL, NULL, NULL, NULL,
+     1, 1, 'S', 5604591, 2, 1, 'BPA',
+     'N', 'N', 'N', 'N', 'N',
+     202601000003, 'CENTRO', 82, NULL, '00000000006');
 
--- Índices para performance
-CREATE INDEX idx_raas_psi_competencia         ON raas_psi (competencia);
-CREATE INDEX idx_raas_psi_unidade             ON raas_psi (unidade_prestadora_servico);
-CREATE INDEX idx_raas_psi_co_unidade          ON raas_psi (co_unidade);
-CREATE INDEX idx_raas_psi_competencia_unidade ON raas_psi (competencia, unidade_prestadora_servico);
+-- 9.3 Itens / procedimentos de cada paciente
+INSERT INTO raas_psi_item (
+    cd_raas_psi_item, cd_raas_psi, linha, unidade_federacao, competencia, unidade_prestadora_servico,
+    cartao_nacional_saude, dt_inicio_validade,
+    cod_procedimento, cod_cbo_executante, cns_executante, dt_execucao_procedimento,
+    servico, classificacao, quantidade_realizada,
+    origem_informacoes, local_realizacao, cpf_paciente
+) VALUES
+    -- Paciente 101 — 3 procedimentos
+    (1001, 101, 1, 52, '2025-12-01', 7018977, '700000000000001', '2025-12-01',
+     301080232, '225125', '700000000000777', '2025-12-04', 115, 1, 1, 'BPA', 'C', '00000000001'),
+    (1002, 101, 2, 52, '2025-12-01', 7018977, '700000000000001', '2025-12-01',
+     301080275, '251510', '700000000000777', '2025-12-11', 115, 2, 1, 'BPA', 'C', '00000000001'),
+    (1003, 101, 3, 52, '2025-12-01', 7018977, '700000000000001', '2025-12-01',
+     301080283, '223505', '987654321098765', '2025-12-18', 115, 1, 1, 'BPA', 'C', '00000000001'),
+    -- Paciente 102 — 4 procedimentos
+    (1004, 102, 1, 52, '2025-12-01', 7018977, '700000000000002', '2025-12-01',
+     301080240, '225170', '700000000000777', '2025-12-05', 115, 1, 1, 'BPA', 'C', '00000000002'),
+    (1005, 102, 2, 52, '2025-12-01', 7018977, '700000000000002', '2025-12-01',
+     301080232, '251510', '700000000000777', '2025-12-12', 115, 2, 1, 'BPA', 'C', '00000000002'),
+    (1006, 102, 3, 52, '2025-12-01', 7018977, '700000000000002', '2025-12-01',
+     301080186, '251510', '700000000000777', '2025-12-19', 115, 2, 1, 'BPA', 'C', '00000000002'),
+    (1007, 102, 4, 52, '2025-12-01', 7018977, '700000000000002', '2025-12-01',
+     301080275, '225170', '700000000000777', '2025-12-26', 115, 1, 1, 'BPA', 'C', '00000000002'),
+    -- Paciente 103 — 2 procedimentos
+    (1008, 103, 1, 52, '2025-12-01', 5604591, '700000000000003', '2025-12-01',
+     301080275, '225170', '700000000000888', '2025-12-06', 115, 1, 1, 'BPA', 'C', '00000000003'),
+    (1009, 103, 2, 52, '2025-12-01', 5604591, '700000000000003', '2025-12-01',
+     301080186, '251510', '700000000000888', '2025-12-13', 115, 2, 1, 'BPA', 'C', '00000000003'),
+    -- Paciente 104 — 5 procedimentos
+    (1010, 104, 1, 52, '2025-12-01', 3624969, '700000000000004', '2025-12-01',
+     301080135, '225170', '700000000000777', '2025-12-02', 115, 1, 1, 'BPA', 'C', '00000000004'),
+    (1011, 104, 2, 52, '2025-12-01', 3624969, '700000000000004', '2025-12-01',
+     301080186, '251510', '700000000000777', '2025-12-09', 115, 2, 1, 'BPA', 'C', '00000000004'),
+    (1012, 104, 3, 52, '2025-12-01', 3624969, '700000000000004', '2025-12-01',
+     301080186, '251510', '700000000000777', '2025-12-16', 115, 2, 1, 'BPA', 'C', '00000000004'),
+    (1013, 104, 4, 52, '2025-12-01', 3624969, '700000000000004', '2025-12-01',
+     301080283, '223505', '987654321098765', '2025-12-23', 115, 1, 1, 'BPA', 'C', '00000000004'),
+    (1014, 104, 5, 52, '2025-12-01', 3624969, '700000000000004', '2025-12-01',
+     301080275, '225170', '700000000000777', '2025-12-30', 115, 1, 1, 'BPA', 'C', '00000000004'),
+    -- Paciente 105 — 6 procedimentos
+    (1015, 105, 1, 52, '2025-12-01', 7018977, '700000000000005', '2025-12-01',
+     301080232, '225125', '700000000000777', '2025-12-03', 115, 1, 1, 'BPA', 'C', '00000000005'),
+    (1016, 105, 2, 52, '2025-12-01', 7018977, '700000000000005', '2025-12-01',
+     301080186, '251510', '700000000000777', '2025-12-10', 115, 2, 1, 'BPA', 'C', '00000000005'),
+    (1017, 105, 3, 52, '2025-12-01', 7018977, '700000000000005', '2025-12-01',
+     301080186, '251510', '700000000000777', '2025-12-17', 115, 2, 1, 'BPA', 'C', '00000000005'),
+    (1018, 105, 4, 52, '2025-12-01', 7018977, '700000000000005', '2025-12-01',
+     301080275, '225170', '700000000000777', '2025-12-24', 115, 1, 1, 'BPA', 'C', '00000000005'),
+    (1019, 105, 5, 52, '2025-12-01', 7018977, '700000000000005', '2025-12-01',
+     301080240, '225170', '700000000000777', '2025-12-29', 115, 1, 1, 'BPA', 'C', '00000000005'),
+    (1020, 105, 6, 52, '2025-12-01', 7018977, '700000000000005', '2025-12-01',
+     301080283, '223505', '987654321098765', '2025-12-31', 115, 1, 1, 'BPA', 'C', '00000000005'),
+    -- Paciente 201 — 3 procedimentos (jan/2026)
+    (2001, 201, 1, 52, '2026-01-01', 7018977, '700000000000001', '2026-01-01',
+     301080232, '225125', '700000000000777', '2026-01-08', 115, 1, 1, 'BPA', 'C', '00000000001'),
+    (2002, 201, 2, 52, '2026-01-01', 7018977, '700000000000001', '2026-01-01',
+     301080275, '251510', '700000000000777', '2026-01-15', 115, 2, 1, 'BPA', 'C', '00000000001'),
+    (2003, 201, 3, 52, '2026-01-01', 7018977, '700000000000001', '2026-01-01',
+     301080283, '223505', '987654321098765', '2026-01-22', 115, 1, 1, 'BPA', 'C', '00000000001'),
+    -- Paciente 202 — 4 procedimentos (jan/2026)
+    (2004, 202, 1, 52, '2026-01-01', 3624969, '700000000000004', '2026-01-01',
+     301080135, '225170', '700000000000777', '2026-01-07', 115, 1, 1, 'BPA', 'C', '00000000004'),
+    (2005, 202, 2, 52, '2026-01-01', 3624969, '700000000000004', '2026-01-01',
+     301080186, '251510', '700000000000777', '2026-01-14', 115, 2, 1, 'BPA', 'C', '00000000004'),
+    (2006, 202, 3, 52, '2026-01-01', 3624969, '700000000000004', '2026-01-01',
+     301080275, '225170', '700000000000777', '2026-01-21', 115, 1, 1, 'BPA', 'C', '00000000004'),
+    (2007, 202, 4, 52, '2026-01-01', 3624969, '700000000000004', '2026-01-01',
+     301080283, '223505', '987654321098765', '2026-01-28', 115, 1, 1, 'BPA', 'C', '00000000004'),
+    -- Paciente 203 — 2 procedimentos (jan/2026)
+    (2008, 203, 1, 52, '2026-01-01', 5604591, '700000000000006', '2026-01-01',
+     301080275, '225170', '700000000000888', '2026-01-09', 115, 1, 1, 'BPA', 'C', '00000000006'),
+    (2009, 203, 2, 52, '2026-01-01', 5604591, '700000000000006', '2026-01-01',
+     301080186, '251510', '700000000000888', '2026-01-23', 115, 2, 1, 'BPA', 'C', '00000000006');
 
--- --------------------------------------------------------------------------
--- Dados de teste: CAPS AD3 NOROESTE — competência Julho/2025 (1356 registros simulados)
--- --------------------------------------------------------------------------
--- Blocos de INSERTs massivos para raas_psi (PostgreSQL) comentados para compatibilidade com H2:
--- INSERT INTO raas_psi (competencia, unidade_prestadora_servico, cns_paciente, nome_paciente,
---                       cns_profissional, cbo_profissional, cid_principal, procedimento_principal, dt_cadastro)
--- SELECT ... FROM generate_series ...
--- (ver linhas 893-995)
+-- 9.4 Arquivos RAAS já processados (para o endpoint de listar/download)
+INSERT INTO raas_processo
+    (mes, ano, dt_geracao, empresa, nome_empresa, path, status, total_folha, texto)
+VALUES
+    (12, 2025, '2025-12-31', 1001, 'CAPS AD3 NOROESTE',
+     'PA52123412202501.txt', '01', 5.00,
+     '01#FATURAMENTO SMS#GCPAH#25141524000123#SECRETARIA MUN DE SAUDE DE GOIANIA#M#20251231#1.0#202512a' || E'\n' ||
+     '02#700000000000001#PACIENTE TESTE UM#19850412#M'),
+    (12, 2025, '2025-12-31', 1002, 'CAPS II SUL',
+     'PA52123412202502.txt', '01', 4.00,
+     '01#FATURAMENTO SMS#GCPAH#25141524000123#SECRETARIA MUN DE SAUDE DE GOIANIA#M#20251231#1.0#202512a' || E'\n' ||
+     '02#700000000000002#PACIENTE TESTE DOIS#19900722#F'),
+    (12, 2025, '2025-12-31', 1003, 'CAPS INFANTO JUVENIL LESTE',
+     'PA52123412202503.txt', '01', 2.00,
+     '01#HEADER INFANTIL'),
+    (12, 2025, '2025-12-31', 1004, 'CAPS AD III NOVO MUNDO',
+     'PA52123412202504.txt', '02', 6.00,
+     '01#HEADER NOVO MUNDO'),
+    ( 1, 2026, '2026-01-31', 1001, 'CAPS AD3 NOROESTE',
+     'PA52123401202601.txt', '01', 3.00,
+     '01#FATURAMENTO SMS#GCPAH#25141524000123#SECRETARIA MUN DE SAUDE DE GOIANIA#M#20260131#1.0#202601a'),
+    ( 1, 2026, '2026-01-31', 1004, 'CAPS AD III NOVO MUNDO',
+     'PA52123401202602.txt', '01', 4.00,
+     '01#HEADER NOVO MUNDO JAN'),
+    -- registro com total_folha = 0 (NÃO deve aparecer na listagem; útil p/ teste negativo)
+    (11, 2025, '2025-11-30', 1005, 'SECRETARIA MUNICIPAL DE SAUDE',
+     'PA52123411202500.txt', '01', 0.00,
+     '01#HEADER VAZIO');
 
--- Dados mínimos para raas_psi (compatível com H2):
-INSERT INTO raas_psi (competencia, unidade_prestadora_servico, cns_paciente, nome_paciente, cns_profissional, cbo_profissional, cid_principal, procedimento_principal, dt_cadastro) VALUES
-  ('2025-07-01', 'CAPS AD3 NOROESTE', '700000000000001', 'PACIENTE TESTE 1', '123456789012345', '225125', 'F10.2', '0301080232', '2025-07-04 08:00:00'),
-  ('2025-11-01', 'CAPS AD3 NOROESTE', '700000001000001', 'PACIENTE TESTE N1', '123456789012345', '225125', 'F19.2', '0301080232', '2025-11-05 09:00:00'),
-  ('2026-01-01', 'CAPS AD3 NOROESTE', '700000002000001', 'PACIENTE TESTE J1', '123456789012345', '225125', 'F11.2', '0301080232', '2026-01-10 10:00:00'),
-  ('2026-03-01', 'CAPS INFANTO JUVENIL LESTE', '700000003000001', 'PACIENTE INFANTIL 1', '234567890123456', '225170', 'F90.0', '0301080275', '2026-03-03 11:00:00'),
-  ('2026-03-01', 'CAPS AD3 NOROESTE', '700000004000001', 'PACIENTE TESTE M1', '123456789012345', '225125', 'F10.2', '0301080232', '2026-03-04 08:30:00'),
-  ('2026-04-01', 'CAPS II SUL', '700000005000001', 'PACIENTE SUL 1', '345678901234567', '225170', 'F31.0', '0301080135', '2026-04-07 07:45:00'),
-  ('2026-05-01', 'CAPS AD3 NOROESTE', '700000006000001', 'PACIENTE TESTE MAIO 1', '123456789012345', '225125', 'F10.2', '0301080232', '2026-05-04 08:00:00');
+-- ============================================================================
+-- 10. PERMISSÕES PARA O USUÁRIO local
+-- ============================================================================
+GRANT USAGE  ON SCHEMA goiania_saude TO local;
+GRANT CREATE ON SCHEMA goiania_saude TO local;
+GRANT ALL PRIVILEGES ON ALL TABLES    IN SCHEMA goiania_saude TO local;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA goiania_saude TO local;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA goiania_saude
+    GRANT ALL ON TABLES    TO local;
+ALTER DEFAULT PRIVILEGES IN SCHEMA goiania_saude
+    GRANT ALL ON SEQUENCES TO local;
+
+ALTER ROLE local IN DATABASE goiania_saude_local SET search_path = goiania_saude, public;
+
+-- ============================================================================
+-- 11. RESUMO  ✓
+-- ============================================================================
+\echo '=========================================================='
+\echo '  BANCO LOCAL CRIADO COM SUCESSO'
+\echo '  Database : goiania_saude_local'
+\echo '  Usuário  : local'
+\echo '  Senha    : local'
+\echo '  Schema   : goiania_saude'
+\echo ''
+\echo '  Dados de teste:'
+\echo '    - 5 empresas (CAPS)'
+\echo '    - 2 cabeçalhos RAAS (competências 12/2025 e 01/2026)'
+\echo '    - 8 pacientes (raas_psi)  / 29 procedimentos (raas_psi_item)'
+\echo '    - 7 arquivos processados (raas_processo)'
+\echo ''
+\echo '  Subir aplicação com:'
+\echo '    mvn spring-boot:run -Dspring-boot.run.profiles=local'
+\echo '=========================================================='
+
+SELECT 'estado'        AS tabela, COUNT(*) AS qtd FROM goiania_saude.estado
+UNION ALL SELECT 'cidade',         COUNT(*) FROM goiania_saude.cidade
+UNION ALL SELECT 'empresa',        COUNT(*) FROM goiania_saude.empresa
+UNION ALL SELECT 'profissional',   COUNT(*) FROM goiania_saude.profissional
+UNION ALL SELECT 'raas',           COUNT(*) FROM goiania_saude.raas
+UNION ALL SELECT 'raas_psi',       COUNT(*) FROM goiania_saude.raas_psi
+UNION ALL SELECT 'raas_psi_item',  COUNT(*) FROM goiania_saude.raas_psi_item
+UNION ALL SELECT 'raas_processo',  COUNT(*) FROM goiania_saude.raas_processo
+ORDER BY tabela;
