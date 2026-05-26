@@ -1,62 +1,43 @@
 -- ============================================================================
---  data.sql — Bootstrap completo do ambiente LOCAL (PostgreSQL)
+--  data.sql — Bootstrap unificado do ambiente (PostgreSQL)
 --  Projeto : goiania-saude-raas
---  Banco   : goiania_saude_local
---  Usuário : local
---  Senha   : local
---  Schema  : goiania_saude  (igual ao default_schema do application.yml)
 --
---  COMO EXECUTAR (a partir de um usuário com privilégio de SUPERUSER):
---     psql -U postgres -h localhost -f data.sql
+--  Arquivo unificado contendo:
+--  - Criação de schema (compatível com Spring Boot SQL init)
+--  - Criação de todas as tabelas
+--  - Dados de bootstrap completos (1831+ pacientes RAAS PSI)
 --
---  Em seguida, suba a aplicação com o profile "local":
---     mvn spring-boot:run -Dspring-boot.run.profiles=local
---     # ou
---     java -jar target/raas-1.0.0-SNAPSHOT.jar --spring.profiles.active=local
+--  COMO EXECUTAR:
+--  1. Com arquivo completo (todas as tabelas + dados):
+--     psql -U postgres -h localhost -d goiania_saude_local -f data.sql
+--
+--  2. Com Spring Boot (application.yml):
+--     spring.sql.init.data-locations=classpath:data.sql
 --
 --  O script é IDEMPOTENTE — pode ser re-executado a qualquer momento.
 -- ============================================================================
 
--- ----------------------------------------------------------------------------
--- 0. Encerra conexões abertas, dropa banco e role (idempotência)
--- ----------------------------------------------------------------------------
-SELECT pg_terminate_backend(pid)
-FROM pg_stat_activity
-WHERE datname = 'goiania_saude_local'
-  AND pid <> pg_backend_pid();
+-- ============================================================================
+-- NOTA: Se executando de forma standalone com SUPERUSER:
+-- Descomente as seções abaixo para criar banco e role
+-- ============================================================================
 
-DROP DATABASE IF EXISTS goiania_saude_local;
-DROP ROLE     IF EXISTS local;
+-- SELECT pg_terminate_backend(pid)
+-- FROM pg_stat_activity
+-- WHERE datname = 'goiania_saude_local'
+--   AND pid <> pg_backend_pid();
+-- DROP DATABASE IF EXISTS goiania_saude_local;
+-- DROP ROLE IF EXISTS local;
+-- CREATE ROLE local WITH LOGIN PASSWORD 'local' CREATEDB;
+-- CREATE DATABASE goiania_saude_local
+--     WITH OWNER = local ENCODING = 'UTF8' TEMPLATE = template0
+--          LC_COLLATE = 'C' LC_CTYPE = 'C';
+-- \connect goiania_saude_local
 
--- ----------------------------------------------------------------------------
--- 1. Cria role / usuário da aplicação
--- ----------------------------------------------------------------------------
-CREATE ROLE local WITH LOGIN PASSWORD 'local' CREATEDB;
-
--- ----------------------------------------------------------------------------
--- 2. Cria banco de dados
--- ----------------------------------------------------------------------------
-CREATE DATABASE goiania_saude_local
-    WITH OWNER     = local
-         ENCODING  = 'UTF8'
-         TEMPLATE  = template0
-         LC_COLLATE = 'C'
-         LC_CTYPE   = 'C';
-
-COMMENT ON DATABASE goiania_saude_local IS
-    'Banco local para testes da aplicação goiania-saude-raas';
-
--- ----------------------------------------------------------------------------
--- 3. Conecta no novo banco
--- ----------------------------------------------------------------------------
-\connect goiania_saude_local
-
--- ----------------------------------------------------------------------------
--- 4. Cria schema goiania_saude (mesmo nome do default_schema da aplicação)
--- ----------------------------------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS goiania_saude AUTHORIZATION local;
-GRANT ALL ON SCHEMA goiania_saude TO local;
-
+-- ============================================================================
+-- Schema e configurações (compatível com Spring Boot SQL init)
+-- ============================================================================
+CREATE SCHEMA IF NOT EXISTS goiania_saude;
 SET search_path TO goiania_saude, public;
 
 -- ============================================================================
@@ -7940,48 +7921,3 @@ VALUES
     -- registro com total_folha = 0 (NÃO deve aparecer em /v1/raas; mas mantém empresa em /v1/unidades)
     (11, 2025, '2025-11-30',    249644, 'CAPS AD III IPE',
      'PA52123411202500.txt', '01', 0.00, '01#HEADER ZERO');
-
--- ============================================================================
--- 10. PERMISSÕES PARA O USUÁRIO local
--- ============================================================================
-GRANT USAGE  ON SCHEMA goiania_saude TO local;
-GRANT CREATE ON SCHEMA goiania_saude TO local;
-GRANT ALL PRIVILEGES ON ALL TABLES    IN SCHEMA goiania_saude TO local;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA goiania_saude TO local;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA goiania_saude
-    GRANT ALL ON TABLES    TO local;
-ALTER DEFAULT PRIVILEGES IN SCHEMA goiania_saude
-    GRANT ALL ON SEQUENCES TO local;
-
-ALTER ROLE local IN DATABASE goiania_saude_local SET search_path = goiania_saude, public;
-
--- ============================================================================
--- 11. RESUMO  ✓
--- ============================================================================
-\echo '=========================================================='
-\echo '  BANCO LOCAL CRIADO COM SUCESSO'
-\echo '  Database : goiania_saude_local'
-\echo '  Usuário  : local'
-\echo '  Senha    : local'
-\echo '  Schema   : goiania_saude'
-\echo ''
-\echo '  Dados de teste:'
-\echo '    - 12 empresas (CAPS de Goiania)'
-\echo '    - 2 cabeçalhos RAAS (competências 12/2025 e 01/2026)'
-\echo '    - 8 pacientes (raas_psi)  / 29 procedimentos (raas_psi_item)'
-\echo '    - 15 arquivos processados (raas_processo)'
-\echo ''
-\echo '  Subir aplicação com:'
-\echo '    mvn spring-boot:run -Dspring-boot.run.profiles=local'
-\echo '=========================================================='
-
-SELECT 'estado'        AS tabela, COUNT(*) AS qtd FROM goiania_saude.estado
-UNION ALL SELECT 'cidade',         COUNT(*) FROM goiania_saude.cidade
-UNION ALL SELECT 'empresa',        COUNT(*) FROM goiania_saude.empresa
-UNION ALL SELECT 'profissional',   COUNT(*) FROM goiania_saude.profissional
-UNION ALL SELECT 'raas',           COUNT(*) FROM goiania_saude.raas
-UNION ALL SELECT 'raas_psi',       COUNT(*) FROM goiania_saude.raas_psi
-UNION ALL SELECT 'raas_psi_item',  COUNT(*) FROM goiania_saude.raas_psi_item
-UNION ALL SELECT 'raas_processo',  COUNT(*) FROM goiania_saude.raas_processo
-ORDER BY tabela;
