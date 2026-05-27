@@ -7,10 +7,13 @@ public final class RaasFormatacaoUtil {
 
     private RaasFormatacaoUtil() { }
 
-    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static final DateTimeFormatter FORMATO_COMPETENCIA = DateTimeFormatter.ofPattern("yyyyMM");
+    private static final DateTimeFormatter FORMATO_DATA =
+            DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter FORMATO_COMPETENCIA =
+            DateTimeFormatter.ofPattern("yyyyMM");
 
-    public static String defaultString(final String value, final String defaultValue) {
+    public static String defaultString(final String value,
+                                        final String defaultValue) {
         return value != null ? value : defaultValue;
     }
 
@@ -30,7 +33,7 @@ public final class RaasFormatacaoUtil {
     }
 
     public static String formatarCns(final String cns) {
-        String digits = onlyDigits(cns);
+        final String digits = onlyDigits(cns);
         return leftPadZeros(digits, 15);
     }
 
@@ -40,7 +43,7 @@ public final class RaasFormatacaoUtil {
 
     public static String formatarData(final LocalDate data) {
         if (data == null) {
-            return "00000000";
+            return "";
         }
         return data.format(FORMATO_DATA);
     }
@@ -78,11 +81,25 @@ public final class RaasFormatacaoUtil {
     }
 
     public static String formatarClassificacao(final Integer classificacao) {
-        return classificacao != null ? String.format("%03d", classificacao) : "001";
+        return classificacao != null
+                ? String.format("%03d", classificacao) : "001";
     }
 
     public static String formatarServico(final Integer servico) {
         return servico != null ? String.format("%03d", servico) : "113";
+    }
+
+    public static String formatarNacionalidade(final Integer nacionalidade) {
+        return nacionalidade != null
+                ? String.format("%03d", nacionalidade) : "010";
+    }
+
+    public static String formatarCarater(final Integer carater) {
+        return carater != null ? String.format("%02d", carater) : "";
+    }
+
+    public static String formatarCid(final String cid) {
+        return cid != null ? cid : "";
     }
 
     private static String onlyDigits(final String value) {
@@ -96,7 +113,7 @@ public final class RaasFormatacaoUtil {
         if (value == null || value.isEmpty()) {
             return "0".repeat(length);
         }
-        String numeric = onlyDigits(value);
+        final String numeric = onlyDigits(value);
         if (numeric.length() >= length) {
             return numeric.substring(numeric.length() - length);
         }

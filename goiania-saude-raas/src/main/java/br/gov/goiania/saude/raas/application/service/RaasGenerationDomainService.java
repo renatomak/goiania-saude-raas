@@ -13,12 +13,13 @@ public final class RaasGenerationDomainService {
         return DIVISOR_CONTROLE + (total % DIVISOR_CONTROLE);
     }
 
-    public static String resolverCns(final String cns,
+    public static String resolverCns(final String cns, final String cpf,
                                      final int tamanho) {
-        if (cns != null && !cns.isBlank()) {
+        if (cns != null && !cns.isBlank()
+                && (cpf == null || cpf.isBlank())) {
             return RaasPaddingUtil.rightPad(cns, tamanho);
         }
-        return RaasPaddingUtil.leftPad("", tamanho);
+        return RaasPaddingUtil.leftPadZeros("", tamanho);
     }
 
     public static String resolverCpf(final String cpf, final String cns,

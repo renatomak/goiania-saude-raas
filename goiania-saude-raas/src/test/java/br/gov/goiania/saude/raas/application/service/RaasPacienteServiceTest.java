@@ -59,7 +59,7 @@ class RaasPacienteServiceTest {
     void gerarLinha15DevePriorizarCnsQuandoCnsECpfInformados() {
         final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();
         paciente.setCnsPaciente("700204928183420");
-        paciente.setCpfPaciente("12345678901");
+        paciente.setCpfPaciente(null);
 
         final String linha = service.gerarLinha15(paciente);
 

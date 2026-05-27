@@ -34,6 +34,7 @@ class RaasPacienteServiceValidacaoTest {
     void validarPosicionamentoExatoCampos() {
         final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();
         paciente.setCnsPaciente("700204928183420");
+        paciente.setCpfPaciente(null);
         final String linha = service.gerarLinha15(paciente);
         final String cnsField = linha.substring(17, 32);
         Assertions.assertThat(cnsField).isEqualTo("700204928183420");

@@ -16,7 +16,7 @@ public final class RaasPaddingUtil {
     }
 
     public static String rightPad(final String value, final int length) {
-        if (value == null) {
+        if (value == null || value.isBlank()) {
             return " ".repeat(length);
         }
         if (value.length() >= length) {

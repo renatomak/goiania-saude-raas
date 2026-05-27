@@ -38,8 +38,18 @@ public class PacientePsicossocialDTO {
     private String tipoDrogaAlcool;
     private String tipoDrogaCrack;
     private String tipoDrogaOutros;
+    private String numeroAutorizacao;
     private String descricaoBairro;
     private String tipoLogradouro;
     private String emailPaciente;
+    private String nacionalidade;
+    private String dtOcorrencia;
+    private String cidSecundario1;
+    private String cidSecundario2;
+    private String cidSecundario3;
+    private String cidCausasAssociadas;
+    private String caraterAtendimento;
+    private Integer totalProcedimentos;
+    private String origemInformacoes;
     private List<AcaoPsicossocialDTO> acoes;
 }

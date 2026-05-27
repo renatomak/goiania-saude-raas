@@ -41,7 +41,7 @@ class RaasFormatacaoUtilTest {
         Assertions.assertThat(RaasFormatacaoUtil.formatarCompetencia(null))
                 .isEqualTo("000000");
         Assertions.assertThat(RaasFormatacaoUtil.formatarData(null))
-                .isEqualTo("00000000");
+                .isEqualTo("");
     }
 }
 

@@ -35,7 +35,7 @@ public class RaasAcaoService {
         sb.append(RaasPaddingUtil.leftPadZeros(paciente.getCompetencia(), TAM_COMPETENCIA));
         sb.append(RaasPaddingUtil.leftPadZeros(paciente.getCnes(), TAM_CNES));
         sb.append(RaasGenerationDomainService.resolverCns(
-                paciente.getCnsPaciente(), TAM_CNS));
+                paciente.getCnsPaciente(), paciente.getCpfPaciente(), TAM_CNS));
         sb.append(RaasPaddingUtil.rightPad(paciente.getDataInicio(), TAM_DATA));
         sb.append(RaasPaddingUtil.leftPadZeros(acao.getProcedimento(), TAM_PROCEDIMENTO));
         sb.append(RaasPaddingUtil.leftPadZeros(acao.getCbo(), TAM_CBO));
