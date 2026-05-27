@@ -88,6 +88,20 @@ class RaasAcaoServiceTest {
     }
 
     @Test
+    @DisplayName("[Linha 16 - Campo 05/16] Quando CNS e CPF informados, CNS deve ser priorizado")
+    void gerarLinha16DevePriorizarCnsQuandoCnsECpfInformados() {
+        final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();
+        paciente.setCnsPaciente("700204928183420");
+        paciente.setCpfPaciente("12345678901");
+        final AcaoPsicossocialDTO acao = AcaoPsicossocialDTOMock.valido();
+
+        final String linha = service.gerarLinha16(paciente, acao);
+
+        Assertions.assertThat(linha.substring(17, 32)).isEqualTo("700204928183420");
+        Assertions.assertThat(linha.substring(95, 106)).isEqualTo("00000000000");
+    }
+
+    @Test
     @DisplayName("[Linha 16 - Campo 17] Deve terminar com filler de 4 espaços")
     void gerarLinha16DeveTerminarComFiller4Espacos() {
         final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();

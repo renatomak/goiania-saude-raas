@@ -26,6 +26,8 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
     private static final String CNPJ_RESPONSAVEL = "25141524000123";
     private static final String NOME_DESTINO = "SECRETARIA MUN DE SAUDE DE GOIANIA";
 
+    private static final String CNES_ZERO = "0000000";
+
     private final RaasPsiRepository repository;
 
     @Override
@@ -80,19 +82,60 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
             final RaasPsiPacienteProjection p,
             final List<RaasPsiItemProjection> itens) {
         final PacientePsicossocialDTO dto = mapearDadosPessoais(p);
+        dto.setCnes(resolverCnes(p, itens));
+        dto.setCnsPaciente(resolverCns(p, itens));
         dto.setNumeroProntuario(p.getNumeroProntuario() != null
                 ? p.getNumeroProntuario().toString() : "");
-        dto.setOrigemPaciente(RaasFormatacaoUtil.formatarOrigem(p.getOrigemPaciente()));
+        dto.setOrigemPaciente(RaasFormatacaoUtil.formatarOrigem(
+                p.getOrigemPaciente()));
         dto.setSituacaoRua(RaasFormatacaoUtil.defaultString(p.getSituacaoRua(), "N"));
         dto.setUsuarioDrogas(RaasFormatacaoUtil.defaultString(p.getUsuarioDrogas(), "N"));
-        dto.setTipoDrogaAlcool(RaasFormatacaoUtil.defaultString(p.getTipoDrogaAlcool(), " "));
-        dto.setTipoDrogaCrack(RaasFormatacaoUtil.defaultString(p.getTipoDrogaCrack(), " "));
-        dto.setTipoDrogaOutros(RaasFormatacaoUtil.defaultString(p.getTipoDrogaOutros(), " "));
+        dto.setTipoDrogaAlcool(RaasFormatacaoUtil.defaultString(
+                p.getTipoDrogaAlcool(), " "));
+        dto.setTipoDrogaCrack(RaasFormatacaoUtil.defaultString(
+                p.getTipoDrogaCrack(), " "));
+        dto.setTipoDrogaOutros(RaasFormatacaoUtil.defaultString(
+                p.getTipoDrogaOutros(), " "));
         dto.setDescricaoBairro(p.getDescricaoBairro());
-        dto.setTipoLogradouro(RaasFormatacaoUtil.formatarTipoLogradouro(p.getTipoLogradouro()));
+        dto.setTipoLogradouro(RaasFormatacaoUtil.formatarTipoLogradouro(
+                p.getTipoLogradouro()));
         dto.setEmailPaciente(p.getEmailPaciente());
         dto.setAcoes(mapearAcoes(itens));
         return dto;
+    }
+
+    private String resolverCnes(final RaasPsiPacienteProjection paciente,
+                                final List<RaasPsiItemProjection> itens) {
+        final String cnesDoPaciente = RaasFormatacaoUtil.formatarCnes(
+                paciente.getUnidadePrestadoraServico());
+        final String cnesDoItem = itens.stream()
+                .map(RaasPsiItemProjection::getUnidadePrestadoraServico)
+                .map(RaasFormatacaoUtil::formatarCnes)
+                .filter(this::isCnesValido)
+                .findFirst()
+                .orElse(CNES_ZERO);
+
+        return isCnesValido(cnesDoItem) ? cnesDoItem : cnesDoPaciente;
+    }
+
+    private String resolverCns(final RaasPsiPacienteProjection paciente,
+                               final List<RaasPsiItemProjection> itens) {
+        final String cnsPaciente = RaasFormatacaoUtil.formatarCns(
+                paciente.getCartaoNacionalSaude());
+        if (!cnsPaciente.isBlank()) {
+            return cnsPaciente;
+        }
+
+        return itens.stream()
+                .map(RaasPsiItemProjection::getCartaoNacionalSaude)
+                .map(RaasFormatacaoUtil::formatarCns)
+                .filter(cns -> !cns.isBlank())
+                .findFirst()
+                .orElse("");
+    }
+
+    private boolean isCnesValido(final String cnes) {
+        return cnes != null && !cnes.isBlank() && !CNES_ZERO.equals(cnes);
     }
 
     private PacientePsicossocialDTO mapearDadosPessoais(
@@ -100,9 +143,7 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         final PacientePsicossocialDTO dto = new PacientePsicossocialDTO();
         dto.setUf(RaasFormatacaoUtil.formatarUf(p.getUnidadeFederacao()));
         dto.setCompetencia(RaasFormatacaoUtil.formatarCompetencia(p.getCompetencia()));
-        dto.setCnes(RaasFormatacaoUtil.formatarCnes(p.getUnidadePrestadoraServico()));
-        dto.setCnsPaciente(RaasFormatacaoUtil.formatarCns(p.getCartaoNacionalSaude()));
-        dto.setCpfPaciente(p.getCpfPaciente());
+        dto.setCpfPaciente(RaasFormatacaoUtil.formatarCpf(p.getCpfPaciente()));
         dto.setDataInicio(RaasFormatacaoUtil.formatarData(p.getDtInicioValidade()));
         dto.setDataFim(RaasFormatacaoUtil.formatarData(p.getDtFinalValidade()));
         dto.setNomePaciente(p.getNmPaciente());
@@ -119,7 +160,8 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         dto.setEtnia(RaasFormatacaoUtil.formatarEtnia(p.getEtnia()));
         dto.setCelular(p.getCelular());
         dto.setTelefone(p.getTelefone());
-        dto.setMotivoSaida(RaasFormatacaoUtil.formatarMotivoSaida(p.getMotivoSaidaPermanencia()));
+        dto.setMotivoSaida(RaasFormatacaoUtil.formatarMotivoSaida(
+                p.getMotivoSaidaPermanencia()));
         dto.setCidPrincipal(p.getCidPrincipal());
         dto.setCoberturaEsf(RaasFormatacaoUtil.defaultString(p.getCoberturaEsf(), "N"));
         dto.setCnesEsf(RaasFormatacaoUtil.formatarCnes(p.getCodigoCoberturaEsf()));
@@ -140,7 +182,8 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
             dto.setQuantidade(i.getQuantidadeRealizada() != null
                     ? i.getQuantidadeRealizada() : 1);
             dto.setServico(RaasFormatacaoUtil.formatarServico(i.getServico()));
-            dto.setLocalRealizacao(RaasFormatacaoUtil.defaultString(i.getLocalRealizacao(), "C"));
+            dto.setLocalRealizacao(RaasFormatacaoUtil.defaultString(
+                    i.getLocalRealizacao(), "C"));
             acoes.add(dto);
         }
         return acoes;

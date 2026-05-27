@@ -25,6 +25,16 @@ public final class RaasPaddingUtil {
         return value + " ".repeat(length - value.length());
     }
 
+    public static String leftPadZeros(final String value, final int length) {
+        if (value == null || value.isBlank()) {
+            return "0".repeat(length);
+        }
+        if (value.length() >= length) {
+            return value.substring(value.length() - length);
+        }
+        return "0".repeat(length - value.length()) + value;
+    }
+
     public static String numericOnly(final String value) {
         if (value == null) {
             return "";
@@ -36,3 +46,4 @@ public final class RaasPaddingUtil {
         return numericOnly(value);
     }
 }
+

@@ -55,6 +55,19 @@ class RaasPacienteServiceTest {
     }
 
     @Test
+    @DisplayName("[Linha 15 - Campo 05/45] Quando CNS e CPF informados, CNS deve ser priorizado")
+    void gerarLinha15DevePriorizarCnsQuandoCnsECpfInformados() {
+        final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();
+        paciente.setCnsPaciente("700204928183420");
+        paciente.setCpfPaciente("12345678901");
+
+        final String linha = service.gerarLinha15(paciente);
+
+        Assertions.assertThat(linha.substring(17, 32)).isEqualTo("700204928183420");
+        Assertions.assertThat(linha.substring(391, 402)).isEqualTo("00000000000");
+    }
+
+    @Test
     @DisplayName("[Linha 15 - Campo 15] Município sem DV deve adicionar espaço na última posição")
     void gerarLinha15DeveAdicionarEspacoQuandoMunicipioSemDv() {
         final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();

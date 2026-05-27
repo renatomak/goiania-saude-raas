@@ -13,10 +13,9 @@ public final class RaasGenerationDomainService {
         return DIVISOR_CONTROLE + (total % DIVISOR_CONTROLE);
     }
 
-    public static String resolverCns(final String cns, final String cpf,
-                                      final int tamanho) {
-        if (cns != null && !cns.isBlank()
-                && (cpf == null || cpf.isBlank())) {
+    public static String resolverCns(final String cns,
+                                     final int tamanho) {
+        if (cns != null && !cns.isBlank()) {
             return RaasPaddingUtil.rightPad(cns, tamanho);
         }
         return RaasPaddingUtil.leftPad("", tamanho);
@@ -26,9 +25,9 @@ public final class RaasGenerationDomainService {
                                       final int tamanho) {
         if (cpf != null && !cpf.isBlank()
                 && (cns == null || cns.isBlank())) {
-            return RaasPaddingUtil.leftPad(cpf, tamanho);
+            return RaasPaddingUtil.leftPadZeros(cpf, tamanho);
         }
-        return RaasPaddingUtil.leftPad("", tamanho);
+        return RaasPaddingUtil.leftPadZeros("", tamanho);
     }
 
     public static void validarTamanhoLinha(final String linha,

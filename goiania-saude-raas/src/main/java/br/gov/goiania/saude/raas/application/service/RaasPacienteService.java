@@ -13,132 +13,84 @@ public class RaasPacienteService {
     private static final String ORIGEM_INFORMACOES = "EXT";
     private static final String FILLER_4 = "    ";
 
-    private static final int TAM_UF = 2;
-    private static final int TAM_COMPETENCIA = 6;
-    private static final int TAM_CNES = 7;
-    private static final int TAM_CNS = 15;
-    private static final int TAM_DATA = 8;
-    private static final int TAM_NOME = 30;
-    private static final int TAM_PRONTUARIO = 10;
-    private static final int TAM_NOME_MAE = 30;
-    private static final int TAM_LOGRADOURO = 30;
-    private static final int TAM_NUMERO_END = 5;
-    private static final int TAM_COMPLEMENTO = 10;
-    private static final int TAM_CEP = 8;
-    private static final int TAM_MUNICIPIO = 7;
-    private static final int TAM_SEXO = 1;
-    private static final int TAM_RACA = 2;
-    private static final int TAM_RESPONSAVEL = 30;
-    private static final int TAM_ETNIA = 4;
-    private static final int TAM_TELEFONE = 11;
-    private static final int TAM_CELULAR = 11;
-    private static final int TAM_MOTIVO_SAIDA = 2;
-    private static final int TAM_CID = 4;
-    private static final int TAM_ORIGEM = 2;
-    private static final int TAM_COBERTURA_ESF = 1;
-    private static final int TAM_CNES_ESF = 7;
-    private static final int TAM_TOTAL_ACOES = 5;
-    private static final int TAM_DESTINO = 2;
-    private static final int TAM_SITUACAO_RUA = 1;
-    private static final int TAM_USUARIO_DROGA = 1;
-    private static final int TAM_TIPO_DROGA = 3;
-    private static final int TAM_BAIRRO = 30;
-    private static final int TAM_TIPO_LOGRADOURO = 3;
-    private static final int TAM_EMAIL = 40;
-    private static final int TAM_CPF = 11;
-    private static final int TAM_FILLER_FINAL = 4;
-
     public String gerarLinha15(final PacientePsicossocialDTO p) {
-        final StringBuilder sb = new StringBuilder(TAMANHO_LINHA_15);
-        sb.append(gerarParteIdentificacao(p));
-        sb.append(gerarParteEnderecoNascimento(p));
-        sb.append(gerarParteResponsavelContato(p));
-        sb.append(gerarParteAdministrativa(p));
-        sb.append(gerarParteFinal(p));
+        final StringBuilder sb = new StringBuilder(420);
+
+        appendIdentificacao(sb, p);
+        appendEnderecoNascimento(sb, p);
+        appendResponsavelContato(sb, p);
+        appendAdministrativo(sb, p);
+        appendFinal(sb, p);
 
         final String linha = sb.toString();
-        RaasGenerationDomainService.validarTamanhoLinha(
-                linha, TAMANHO_LINHA_15, "15");
+        RaasGenerationDomainService.validarTamanhoLinha(linha, TAMANHO_LINHA_15, "15");
         return linha;
     }
 
-    private String gerarParteIdentificacao(final PacientePsicossocialDTO p) {
-        final StringBuilder sb = new StringBuilder();
+    private void appendIdentificacao(final StringBuilder sb, final PacientePsicossocialDTO p) {
         sb.append(CODIGO_LINHA_15);
-        sb.append(RaasPaddingUtil.leftPad(p.getUf(), TAM_UF));
-        sb.append(RaasPaddingUtil.leftPad(p.getCompetencia(), TAM_COMPETENCIA));
-        sb.append(RaasPaddingUtil.leftPad(p.getCnes(), TAM_CNES));
-        sb.append(RaasGenerationDomainService.resolverCns(
-                p.getCnsPaciente(), p.getCpfPaciente(), TAM_CNS));
-        sb.append(RaasPaddingUtil.rightPad(p.getDataInicio(), TAM_DATA));
-        sb.append(RaasPaddingUtil.rightPad(p.getDataFim(), TAM_DATA));
-        sb.append(RaasPaddingUtil.rightPad(p.getNomePaciente(), TAM_NOME));
-        sb.append(RaasPaddingUtil.rightPad(p.getNumeroProntuario(), TAM_PRONTUARIO));
-        sb.append(RaasPaddingUtil.rightPad(p.getNomeMae(), TAM_NOME_MAE));
-        return sb.toString();
+        sb.append(RaasPaddingUtil.leftPadZeros(p.getUf(), 2));
+        sb.append(RaasPaddingUtil.leftPadZeros(p.getCompetencia(), 6));
+        sb.append(RaasPaddingUtil.leftPadZeros(p.getCnes(), 7));
+        sb.append(RaasGenerationDomainService.resolverCns(p.getCnsPaciente(), 15));
+        sb.append(RaasPaddingUtil.rightPad(p.getDataInicio(), 8));
+        sb.append(RaasPaddingUtil.rightPad(p.getDataFim(), 8));
+        sb.append(RaasPaddingUtil.rightPad(p.getNomePaciente(), 30));
+        sb.append(RaasPaddingUtil.rightPad(p.getNumeroProntuario(), 10));
+        sb.append(RaasPaddingUtil.rightPad(p.getNomeMae(), 30));
     }
 
-    private String gerarParteEnderecoNascimento(final PacientePsicossocialDTO p) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(RaasPaddingUtil.rightPad(p.getLogradouro(), TAM_LOGRADOURO));
-        sb.append(RaasPaddingUtil.rightPad(p.getNumeroEndereco(), TAM_NUMERO_END));
-        sb.append(RaasPaddingUtil.rightPad(p.getComplemento(), TAM_COMPLEMENTO));
-        sb.append(RaasPaddingUtil.rightPad(p.getCep(), TAM_CEP));
-        sb.append(RaasPaddingUtil.rightPad(p.getMunicipioIbge(), TAM_MUNICIPIO));
-        sb.append(RaasPaddingUtil.rightPad(p.getDataNascimento(), TAM_DATA));
-        sb.append(RaasPaddingUtil.rightPad(p.getSexo(), TAM_SEXO));
-        sb.append(RaasPaddingUtil.rightPad(p.getRacaCor(), TAM_RACA));
-        return sb.toString();
+    private void appendEnderecoNascimento(final StringBuilder sb, final PacientePsicossocialDTO p) {
+        sb.append(RaasPaddingUtil.rightPad(p.getLogradouro(), 30));
+        sb.append(RaasPaddingUtil.rightPad(p.getNumeroEndereco(), 5));
+        sb.append(RaasPaddingUtil.rightPad(p.getComplemento(), 10));
+        sb.append(RaasPaddingUtil.rightPad(p.getCep(), 8));
+        sb.append(RaasPaddingUtil.rightPad(p.getMunicipioIbge(), 7));
+        sb.append(RaasPaddingUtil.rightPad(p.getDataNascimento(), 8));
+        sb.append(RaasPaddingUtil.rightPad(p.getSexo(), 1));
+        sb.append(RaasPaddingUtil.rightPad(p.getRacaCor(), 2));
     }
 
-    private String gerarParteResponsavelContato(final PacientePsicossocialDTO p) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(RaasPaddingUtil.rightPad(p.getNomeResponsavel(), TAM_RESPONSAVEL));
+    private void appendResponsavelContato(final StringBuilder sb, final PacientePsicossocialDTO p) {
+        sb.append(RaasPaddingUtil.rightPad(p.getNomeResponsavel(), 30));
         sb.append(NACIONALIDADE_BRASILEIRA);
-        sb.append(RaasPaddingUtil.rightPad(p.getEtnia(), TAM_ETNIA));
-        sb.append(RaasPaddingUtil.rightPad(p.getTelefone(), TAM_TELEFONE));
-        sb.append(RaasPaddingUtil.rightPad(p.getCelular(), TAM_CELULAR));
-        sb.append(RaasPaddingUtil.rightPad(p.getMotivoSaida(), TAM_MOTIVO_SAIDA));
-        return sb.toString();
+        sb.append(RaasPaddingUtil.rightPad(p.getEtnia(), 4));
+        sb.append(RaasPaddingUtil.rightPad(p.getTelefone(), 11));
+        sb.append(RaasPaddingUtil.rightPad(p.getCelular(), 11));
+        sb.append(RaasPaddingUtil.rightPad(p.getMotivoSaida(), 2));
     }
 
-    private String gerarParteAdministrativa(final PacientePsicossocialDTO p) {
-        final StringBuilder sb = new StringBuilder();
+    private void appendAdministrativo(final StringBuilder sb, final PacientePsicossocialDTO p) {
         sb.append("        ");
-        sb.append(RaasPaddingUtil.rightPad(p.getCidPrincipal(), TAM_CID));
+        sb.append(RaasPaddingUtil.rightPad(p.getCidPrincipal(), 4));
         sb.append("    ".repeat(4));
         sb.append("  ");
-        sb.append(RaasPaddingUtil.rightPad(p.getOrigemPaciente(), TAM_ORIGEM));
-        sb.append(RaasPaddingUtil.rightPad(p.getCoberturaEsf(), TAM_COBERTURA_ESF));
-        sb.append(RaasPaddingUtil.rightPad(p.getCnesEsf(), TAM_CNES_ESF));
-        sb.append(RaasPaddingUtil.leftPad(
-                String.valueOf(p.getAcoes().size()), TAM_TOTAL_ACOES));
-        sb.append(RaasPaddingUtil.rightPad(p.getDestinoPaciente(), TAM_DESTINO));
+        sb.append(RaasPaddingUtil.rightPad(p.getOrigemPaciente(), 2));
+        sb.append(RaasPaddingUtil.rightPad(p.getCoberturaEsf(), 1));
+        sb.append(RaasPaddingUtil.leftPadZeros(p.getCnesEsf(), 7));
+        sb.append(RaasPaddingUtil.leftPadZeros(String.valueOf(p.getAcoes() != null ? p.getAcoes().size() : 0), 5));
+        sb.append(RaasPaddingUtil.rightPad(p.getDestinoPaciente(), 2));
         sb.append(ORIGEM_INFORMACOES);
-        sb.append(RaasPaddingUtil.rightPad(p.getSituacaoRua(), TAM_SITUACAO_RUA));
-        sb.append(RaasPaddingUtil.rightPad(p.getUsuarioDrogas(), TAM_USUARIO_DROGA));
+        sb.append(RaasPaddingUtil.rightPad(p.getSituacaoRua(), 1));
+        sb.append(RaasPaddingUtil.rightPad(p.getUsuarioDrogas(), 1));
         sb.append(formatarTipoDroga(p));
-        return sb.toString();
     }
 
-    private String gerarParteFinal(final PacientePsicossocialDTO p) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("             ");
-        sb.append(RaasPaddingUtil.rightPad(p.getDescricaoBairro(), TAM_BAIRRO));
-        sb.append(RaasPaddingUtil.rightPad(p.getTipoLogradouro(), TAM_TIPO_LOGRADOURO));
-        sb.append(RaasPaddingUtil.rightPad(p.getEmailPaciente(), TAM_EMAIL));
-        sb.append(RaasGenerationDomainService.resolverCpf(
-                p.getCpfPaciente(), p.getCnsPaciente(), TAM_CPF));
+    private void appendFinal(final StringBuilder sb, final PacientePsicossocialDTO p) {
+        sb.append(RaasPaddingUtil.rightPad("", 13));
+        sb.append(RaasPaddingUtil.rightPad(p.getDescricaoBairro(), 30));
+        sb.append(RaasPaddingUtil.rightPad(p.getTipoLogradouro(), 3));
+        sb.append(RaasPaddingUtil.rightPad(p.getEmailPaciente(), 40));
+        sb.append(RaasGenerationDomainService.resolverCpf(p.getCpfPaciente(), p.getCnsPaciente(), 11));
         sb.append(FILLER_4);
-        return sb.toString();
     }
 
     private String formatarTipoDroga(final PacientePsicossocialDTO p) {
         if (!"S".equalsIgnoreCase(p.getUsuarioDrogas())) {
-            return " ".repeat(TAM_TIPO_DROGA);
+            return "   ";
         }
-        return RaasPaddingUtil.rightPad(p.getTipoDrogaAlcool(), 1)
-                + RaasPaddingUtil.rightPad(p.getTipoDrogaCrack(), 1)
-                + RaasPaddingUtil.rightPad(p.getTipoDrogaOutros(), 1);
+        return RaasPaddingUtil.rightPad(p.getTipoDrogaAlcool() != null ? p.getTipoDrogaAlcool() : "", 1)
+                + RaasPaddingUtil.rightPad(p.getTipoDrogaCrack() != null ? p.getTipoDrogaCrack() : "", 1)
+                + RaasPaddingUtil.rightPad(p.getTipoDrogaOutros() != null ? p.getTipoDrogaOutros() : "", 1);
     }
 }

@@ -31,19 +31,19 @@ public class RaasAcaoService {
                                final AcaoPsicossocialDTO acao) {
         final StringBuilder sb = new StringBuilder(TAMANHO_LINHA);
         sb.append(CODIGO_LINHA);
-        sb.append(RaasPaddingUtil.leftPad(paciente.getUf(), TAM_UF));
-        sb.append(RaasPaddingUtil.leftPad(paciente.getCompetencia(), TAM_COMPETENCIA));
-        sb.append(RaasPaddingUtil.leftPad(paciente.getCnes(), TAM_CNES));
+        sb.append(RaasPaddingUtil.leftPadZeros(paciente.getUf(), TAM_UF));
+        sb.append(RaasPaddingUtil.leftPadZeros(paciente.getCompetencia(), TAM_COMPETENCIA));
+        sb.append(RaasPaddingUtil.leftPadZeros(paciente.getCnes(), TAM_CNES));
         sb.append(RaasGenerationDomainService.resolverCns(
-                paciente.getCnsPaciente(), paciente.getCpfPaciente(), TAM_CNS));
+                paciente.getCnsPaciente(), TAM_CNS));
         sb.append(RaasPaddingUtil.rightPad(paciente.getDataInicio(), TAM_DATA));
-        sb.append(RaasPaddingUtil.leftPad(acao.getProcedimento(), TAM_PROCEDIMENTO));
-        sb.append(RaasPaddingUtil.leftPad(acao.getCbo(), TAM_CBO));
+        sb.append(RaasPaddingUtil.leftPadZeros(acao.getProcedimento(), TAM_PROCEDIMENTO));
+        sb.append(RaasPaddingUtil.leftPadZeros(acao.getCbo(), TAM_CBO));
         sb.append(RaasPaddingUtil.rightPad(acao.getCnsProfissional(), TAM_CNS_PROFISSIONAL));
         sb.append(RaasPaddingUtil.rightPad(acao.getDataExecucao(), TAM_DATA));
         sb.append(RaasPaddingUtil.rightPad(acao.getServico(), TAM_SERVICO));
         sb.append(RaasPaddingUtil.rightPad(acao.getClassificacao(), TAM_CLASSIFICACAO));
-        sb.append(RaasPaddingUtil.leftPad(acao.getQuantidade().toString(), TAM_QUANTIDADE));
+        sb.append(RaasPaddingUtil.leftPadZeros(acao.getQuantidade().toString(), TAM_QUANTIDADE));
         sb.append(ORIGEM_INFORMACOES);
         sb.append(RaasPaddingUtil.rightPad(acao.getLocalRealizacao(), TAM_LOCAL));
         sb.append(RaasGenerationDomainService.resolverCpf(

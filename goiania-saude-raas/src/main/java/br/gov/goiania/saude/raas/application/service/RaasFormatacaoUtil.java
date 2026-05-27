@@ -7,55 +7,70 @@ public final class RaasFormatacaoUtil {
 
     private RaasFormatacaoUtil() { }
 
-    private static final DateTimeFormatter FORMATO_DATA =
-            DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static final DateTimeFormatter FORMATO_COMPETENCIA =
-            DateTimeFormatter.ofPattern("yyyyMM");
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter FORMATO_COMPETENCIA = DateTimeFormatter.ofPattern("yyyyMM");
 
-    public static String defaultString(final String value,
-                                        final String defaultValue) {
+    public static String defaultString(final String value, final String defaultValue) {
         return value != null ? value : defaultValue;
     }
 
     public static String formatarUf(final Integer uf) {
-        return uf != null ? String.valueOf(uf) : "52";
+        return leftPadZeros(uf != null ? uf.toString() : "52", 2);
     }
 
     public static String formatarCompetencia(final LocalDate competencia) {
-        return competencia != null
-                ? competencia.format(FORMATO_COMPETENCIA) : "";
+        if (competencia == null) {
+            return "000000";
+        }
+        return competencia.format(FORMATO_COMPETENCIA);
     }
 
     public static String formatarCnes(final Integer unidade) {
-        return unidade != null ? String.valueOf(unidade) : "";
+        return leftPadZeros(unidade != null ? unidade.toString() : "", 7);
     }
 
     public static String formatarCns(final String cns) {
-        return cns != null ? cns.replaceAll("\\D", "") : "";
+        String digits = onlyDigits(cns);
+        return leftPadZeros(digits, 15);
+    }
+
+    public static String formatarCpf(final String cpf) {
+        return onlyDigits(cpf);
     }
 
     public static String formatarData(final LocalDate data) {
-        return data != null ? data.format(FORMATO_DATA) : "";
+        if (data == null) {
+            return "00000000";
+        }
+        return data.format(FORMATO_DATA);
     }
 
     public static String formatarMunicipio(final Integer municipio) {
-        return municipio != null ? String.valueOf(municipio) : "";
+        return leftPadZeros(municipio != null ? municipio.toString() : "", 7);
     }
 
     public static String formatarRaca(final Integer raca) {
-        return raca != null ? String.format("%02d", raca) : "";
+        return raca != null ? String.format("%02d", raca) : "99";
     }
 
-    public static String formatarEtnia(final Integer etnia) {
-        return etnia != null ? String.valueOf(etnia) : "";
+    public static String formatarOrigem(final Integer origem) {
+        return origem != null ? String.format("%02d", origem) : "01";
+    }
+
+    public static String formatarDestino(final Integer destino) {
+        return destino != null ? String.format("%02d", destino) : "00";
     }
 
     public static String formatarMotivoSaida(final Integer motivo) {
         return motivo != null ? String.format("%02d", motivo) : "00";
     }
 
-    public static String formatarDestino(final Integer destino) {
-        return destino != null ? String.format("%02d", destino) : "00";
+    public static String formatarEtnia(final Integer etnia) {
+        return etnia != null ? String.valueOf(etnia) : "";
+    }
+
+    public static String formatarTipoLogradouro(final Integer tipo) {
+        return tipo != null ? String.format("%03d", tipo) : "";
     }
 
     public static String formatarProcedimento(final Long procedimento) {
@@ -63,19 +78,28 @@ public final class RaasFormatacaoUtil {
     }
 
     public static String formatarClassificacao(final Integer classificacao) {
-        return classificacao != null
-                ? String.format("%03d", classificacao) : "001";
+        return classificacao != null ? String.format("%03d", classificacao) : "001";
     }
 
     public static String formatarServico(final Integer servico) {
         return servico != null ? String.format("%03d", servico) : "113";
     }
 
-    public static String formatarOrigem(final Integer origem) {
-        return origem != null ? String.format("%02d", origem) : "01";
+    private static String onlyDigits(final String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replaceAll("\\D", "");
     }
 
-    public static String formatarTipoLogradouro(final Integer tipo) {
-        return tipo != null ? String.format("%03d", tipo) : "";
+    private static String leftPadZeros(final String value, final int length) {
+        if (value == null || value.isEmpty()) {
+            return "0".repeat(length);
+        }
+        String numeric = onlyDigits(value);
+        if (numeric.length() >= length) {
+            return numeric.substring(numeric.length() - length);
+        }
+        return "0".repeat(length - numeric.length()) + numeric;
     }
 }
