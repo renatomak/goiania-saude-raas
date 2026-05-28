@@ -74,7 +74,11 @@ public class RaasPacienteService {
         sb.append(RaasPaddingUtil.rightPad(p.getCaraterAtendimento(), 2));
         sb.append(RaasPaddingUtil.rightPad(p.getOrigemPaciente(), 2));
         sb.append(RaasPaddingUtil.rightPad(p.getCoberturaEsf(), 1));
-        sb.append(RaasPaddingUtil.rightPad(p.getCnesEsf(), 7));
+        if ("S".equalsIgnoreCase(p.getCoberturaEsf())) {
+            sb.append(RaasPaddingUtil.leftPadZeros(p.getCnesEsf(), 7));
+        } else {
+            sb.append("       ");
+        }
         sb.append(RaasPaddingUtil.leftPadZeros(
                 String.valueOf(p.getTotalProcedimentos() != null
                         ? p.getTotalProcedimentos() : 0), 5));

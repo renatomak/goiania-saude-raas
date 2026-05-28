@@ -44,14 +44,14 @@ class RaasPacienteServiceTest {
     }
 
     @Test
-    @DisplayName("[Linha 15 - Campo 05/45] Quando CPF informado, deve preencher CPF e CNS como zeros")
+    @DisplayName("[Linha 15 - Campo 05/45] Quando CPF valido informado, deve preencher CPF e CNS como zeros")
     void gerarLinha15DevePreencherCpfQuandoInformado() {
         final PacientePsicossocialDTO paciente = PacientePsicossocialDTOMock.valido();
         paciente.setCnsPaciente(null);
-        paciente.setCpfPaciente("12345678901");
+        paciente.setCpfPaciente("52998224725");
         final String linha = service.gerarLinha15(paciente);
         Assertions.assertThat(linha.substring(17, 32)).isEqualTo("000000000000000");
-        Assertions.assertThat(linha.substring(391, 402)).isEqualTo("12345678901");
+        Assertions.assertThat(linha.substring(391, 402)).isEqualTo("52998224725");
     }
 
     @Test
