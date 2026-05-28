@@ -44,7 +44,7 @@ public class RaasAcaoService {
         sb.append(RaasPaddingUtil.rightPad(acao.getServico(), TAM_SERVICO));
         sb.append(RaasPaddingUtil.rightPad(acao.getClassificacao(), TAM_CLASSIFICACAO));
         sb.append(RaasPaddingUtil.leftPadZeros(acao.getQuantidade().toString(), TAM_QUANTIDADE));
-        sb.append(ORIGEM_INFORMACOES);
+        sb.append(RaasPaddingUtil.rightPad(acao.getOrigemInformacoes(), 3));
         sb.append(RaasPaddingUtil.rightPad(acao.getLocalRealizacao(), TAM_LOCAL));
         sb.append(RaasGenerationDomainService.resolverCpf(
                 paciente.getCpfPaciente(), paciente.getCnsPaciente(), TAM_CPF));

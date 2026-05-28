@@ -16,6 +16,7 @@ public final class AcaoPsicossocialDTOMock {
         dto.setQuantidade(5);
         dto.setServico("001");
         dto.setLocalRealizacao("A");
+        dto.setOrigemInformacoes("EXT");
         return dto;
     }
 
@@ -29,6 +30,7 @@ public final class AcaoPsicossocialDTOMock {
         dto.setQuantidade(10);
         dto.setServico("002");
         dto.setLocalRealizacao("B");
+        dto.setOrigemInformacoes("RAS");
         return dto;
     }
 }

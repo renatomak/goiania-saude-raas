@@ -188,6 +188,8 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
             dto.setServico(RaasFormatacaoUtil.formatarServico(i.getServico()));
             dto.setLocalRealizacao(RaasFormatacaoUtil.defaultString(
                     i.getLocalRealizacao(), "C"));
+            dto.setOrigemInformacoes(RaasFormatacaoUtil.defaultString(
+                    i.getOrigemInformacoes(), "RAS"));
             acoes.add(dto);
         }
         return acoes;

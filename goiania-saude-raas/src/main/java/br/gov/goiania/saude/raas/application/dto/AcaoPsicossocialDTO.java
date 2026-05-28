@@ -12,4 +12,5 @@ public class AcaoPsicossocialDTO {
     private Integer quantidade;
     private String servico;
     private String localRealizacao;
+    private String origemInformacoes;
 }
