@@ -39,7 +39,7 @@ public class RaasAcaoService {
         sb.append(RaasPaddingUtil.rightPad(paciente.getDataInicio(), TAM_DATA));
         sb.append(RaasPaddingUtil.leftPadZeros(acao.getProcedimento(), TAM_PROCEDIMENTO));
         sb.append(RaasPaddingUtil.leftPadZeros(acao.getCbo(), TAM_CBO));
-        sb.append(RaasPaddingUtil.rightPad(acao.getCnsProfissional(), TAM_CNS_PROFISSIONAL));
+        sb.append(RaasPaddingUtil.leftPadZeros(acao.getCnsProfissional(), TAM_CNS_PROFISSIONAL));
         sb.append(RaasPaddingUtil.rightPad(acao.getDataExecucao(), TAM_DATA));
         sb.append(RaasPaddingUtil.rightPad(acao.getServico(), TAM_SERVICO));
         sb.append(RaasPaddingUtil.rightPad(acao.getClassificacao(), TAM_CLASSIFICACAO));

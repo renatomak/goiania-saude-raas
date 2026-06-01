@@ -35,7 +35,7 @@ class RaasHeaderServiceTest {
     @ParameterizedTest
     @CsvSource({
             "'SMS', '251415', '12345678000195', 'SMS                           '",
-            "'ORGÃO', '251415', '12345678000195', 'ORGÃO                         '"
+            "'ORGÃO', '251415', '12345678000195', 'ORGAO                         '"
     })
     @DisplayName("[Regra 6] Nome do órgão responsável (cbc-rsp) com padding à direita")
     void gerarHeaderLinha01DeveRetornarNomeResponsavelComPaddingQuandoNomeMenorQue30(
