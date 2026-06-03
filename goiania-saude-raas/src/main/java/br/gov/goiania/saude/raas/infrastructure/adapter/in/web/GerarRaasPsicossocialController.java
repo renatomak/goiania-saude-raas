@@ -26,4 +26,16 @@ public class GerarRaasPsicossocialController implements GerarRaasPsicossocialSwa
             .contentType(MediaType.TEXT_PLAIN)
             .body(conteudo);
     }
+
+    @GetMapping(value = "/gerar/{mes}/{ano}/{cdRaasPsi}",
+            produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> gerarPaciente(
+            @PathVariable final Integer mes,
+            @PathVariable final Integer ano,
+            @PathVariable final Long cdRaasPsi) {
+        final String conteudo = useCase.executePaciente(mes, ano, cdRaasPsi);
+        return ResponseEntity.ok()
+            .contentType(MediaType.TEXT_PLAIN)
+            .body(conteudo);
+    }
 }
