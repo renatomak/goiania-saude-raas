@@ -1,32 +1,128 @@
 {
   "info": {
-    "_postman_id": "b7e1e2c2-1a2b-4e2a-9b1a-123456789abc",
+    "_postman_id": "8f8e9221-ec97-4ab8-95f8-64d31dd4fb6c",
     "name": "goiania-saude-raas",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection dos endpoints do fluxo RAAS. Use com os arquivos de environment do projeto."
   },
+  "variable": [
+    { "key": "protocol", "value": "http" },
+    { "key": "host", "value": "localhost" },
+    { "key": "port", "value": "8081" },
+    { "key": "basePath", "value": "api" },
+    { "key": "baseUrl", "value": "{{protocol}}://{{host}}:{{port}}/{{basePath}}" },
+    { "key": "mes", "value": "5" },
+    { "key": "ano", "value": "2026" },
+    { "key": "codigoEmpresa", "value": "123" },
+    { "key": "situacao", "value": "3" },
+    { "key": "page", "value": "0" },
+    { "key": "size", "value": "10" },
+    { "key": "idArquivo", "value": "1" },
+    { "key": "cdRaasPsi", "value": "1" }
+  ],
   "item": [
     {
-      "name": "Listar Arquivos RAAS",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8081/api/v1/raas?mes=5&ano=2026&codigoEmpresa=123&situacao=ATIVO&situacao=INATIVO",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8081",
-          "path": ["api", "v1", "raas"],
-          "query": [
-            { "key": "mes", "value": "5" },
-            { "key": "ano", "value": "2026" },
-            { "key": "codigoEmpresa", "value": "123" },
-            { "key": "situacao", "value": "ATIVO" },
-            { "key": "situacao", "value": "INATIVO" }
-          ]
+      "name": "Arquivos RAAS",
+      "item": [
+        {
+          "name": "Listar Arquivos RAAS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/raas?mes={{mes}}&ano={{ano}}&codigoEmpresa={{codigoEmpresa}}&situacao={{situacao}}&page={{page}}&size={{size}}",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["{{basePath}}", "v1", "raas"],
+              "query": [
+                { "key": "mes", "value": "{{mes}}" },
+                { "key": "ano", "value": "{{ano}}" },
+                { "key": "codigoEmpresa", "value": "{{codigoEmpresa}}" },
+                { "key": "situacao", "value": "{{situacao}}" },
+                { "key": "page", "value": "{{page}}" },
+                { "key": "size", "value": "{{size}}" }
+              ]
+            },
+            "description": "Lista arquivos RAAS com filtros opcionais e paginacao."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Arquivo RAAS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/raas/{{idArquivo}}",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["{{basePath}}", "v1", "raas", "{{idArquivo}}"]
+            },
+            "description": "Faz download de um arquivo RAAS por id."
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "RAAS Psicossocial",
+      "item": [
+        {
+          "name": "Gerar RAAS Psicossocial (Competencia)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/raas/psicossocial/gerar/{{mes}}/{{ano}}",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["{{basePath}}", "v1", "raas", "psicossocial", "gerar", "{{mes}}", "{{ano}}"]
+            },
+            "description": "Gera o conteudo RAAS psicossocial para a competencia informada."
+          },
+          "response": []
+        },
+        {
+          "name": "Gerar RAAS Psicossocial (Paciente)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/raas/psicossocial/gerar/{{mes}}/{{ano}}/{{cdRaasPsi}}",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["{{basePath}}", "v1", "raas", "psicossocial", "gerar", "{{mes}}", "{{ano}}", "{{cdRaasPsi}}"]
+            },
+            "description": "Gera o conteudo RAAS psicossocial para um paciente especifico (cdRaasPsi)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Unidades",
+      "item": [
+        {
+          "name": "Listar Unidades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/unidades",
+              "protocol": "{{protocol}}",
+              "host": ["{{host}}"],
+              "port": "{{port}}",
+              "path": ["{{basePath}}", "v1", "unidades"]
+            },
+            "description": "Lista unidades disponiveis para filtro no RAAS."
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
-
