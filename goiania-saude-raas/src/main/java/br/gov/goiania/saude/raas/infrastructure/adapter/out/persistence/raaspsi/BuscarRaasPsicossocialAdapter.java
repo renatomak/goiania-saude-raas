@@ -66,7 +66,6 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         header.setCnpjResponsavel(CNPJ_RESPONSAVEL);
         header.setNomeDestino(NOME_DESTINO);
         if (headerProj != null) {
-            header.setQuantidadeFolhas(headerProj.getQuantidadeFolhas());
             header.setCampoControle(headerProj.getCampoControle());
             header.setDataGeracao(headerProj.getDtGeracao() != null
                     ? headerProj.getDtGeracao().format(FORMATO_DATA) : "");
@@ -168,7 +167,6 @@ public class BuscarRaasPsicossocialAdapter implements BuscarRaasPsicossocialPort
         dto.setCidSecundario3(p.getCidSecundario3());
         dto.setCidCausasAssociadas(p.getCidCausasAssociadas());
         dto.setCaraterAtendimento(RaasFormatacaoUtil.formatarCarater(p.getCaraterAtendimento()));
-        dto.setTotalProcedimentos(p.getTotalProcedimentos());
         dto.setOrigemInformacoes(RaasFormatacaoUtil.defaultString(
                 p.getOrigemInformacoes(), "RAS"));
     }
